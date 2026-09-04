@@ -7,8 +7,11 @@
   <title>教育訓練統計轉檔工具</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="satisfaction-settings.css" />
+  <link rel="stylesheet" href="report-meta.css" />
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
   <main class="page-shell">
@@ -145,11 +148,14 @@
 
   <script src="app.js"></script>
   <script src="satisfaction-settings.js"></script>
+  <script src="report-meta.js"></script>
   <script src="name-capture.js"></script>
   <script src="quiz-parser.js"></script>
   <script src="export.js"></script>
   <script src="detail-patch.js"></script>
   <script src="layout-patch.js"></script>
   <script src="detail-alignment-patch.js"></script>
+  <script src="report-meta-patch.js"></script>
+  <script src="pdf-export.js"></script>
 </body>
 </html>
