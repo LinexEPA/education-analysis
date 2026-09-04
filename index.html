@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="教育訓練滿意度與測驗統計轉檔工具" />
+  <title>教育訓練統計轉檔工具</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <main class="page-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">教育訓練資料整理</p>
+        <h1>教育訓練統計轉檔工具</h1>
+        <p class="hero-copy">上傳院內下載的 ODS / XLSX，快速辨識測驗與滿意度資料，再依需要補上題目與選項。</p>
+      </div>
+      <div class="privacy-pill">原始檔僅在瀏覽器端解析</div>
+    </header>
+
+    <section class="step-card" id="uploadStep">
+      <div class="step-heading">
+        <span class="step-number">1</span>
+        <div>
+          <h2>上傳院內資料</h2>
+          <p>支援 .ods、.xlsx、.xls。姓名與身分證字號不會顯示在分析畫面。</p>
+        </div>
+      </div>
+
+      <label class="drop-zone" id="dropZone" for="fileInput">
+        <input id="fileInput" type="file" accept=".ods,.xlsx,.xls" hidden />
+        <div class="drop-icon">⇧</div>
+        <strong>拖曳檔案到這裡，或點一下選擇檔案</strong>
+        <span>院內教育訓練匯出檔</span>
+      </label>
+
+      <div id="fileStatus" class="status-line muted">尚未選擇檔案</div>
+
+      <div id="summaryCards" class="summary-grid hidden">
+        <article class="summary-card"><span>課程代碼</span><strong id="courseCode">—</strong></article>
+        <article class="summary-card"><span>資料筆數</span><strong id="rowCount">—</strong></article>
+        <article class="summary-card"><span>測驗題數</span><strong id="quizCount">—</strong></article>
+        <article class="summary-card"><span>滿意度題數</span><strong id="satCount">—</strong></article>
+      </div>
+
+      <div id="formatCheck" class="check-panel hidden"></div>
+    </section>
+
+    <section class="step-card">
+      <div class="step-heading">
+        <span class="step-number">2</span>
+        <div>
+          <h2>貼上測驗題目與選項 <span class="optional">選填</span></h2>
+          <p>整份測驗一次貼上即可。建議依灰字範例標示，解析最穩定。</p>
+        </div>
+      </div>
+
+      <textarea
+        id="quizText"
+        class="quiz-textarea"
+        spellcheck="false"
+        placeholder="[Q1] 題目內容&#10;[A] 選項A&#10;[B] 選項B&#10;[C] 選項C&#10;[D] 選項D&#10;&#10;[Q2] 題目內容&#10;[O] 正確&#10;[X] 錯誤"
+      ></textarea>
+
+      <div class="helper-row">
+        <span>選項也可使用 [1]～[4]、[O] / [X]。未貼題目仍可進行統計。</span>
+        <button id="parseQuizBtn" class="secondary-btn" type="button">解析題目</button>
+      </div>
+
+      <div id="quizParseStatus" class="status-line muted">尚未解析題目</div>
+      <div id="quizPreview" class="preview-list hidden"></div>
+    </section>
+
+    <section class="step-card hidden" id="analysisStep">
+      <div class="step-heading">
+        <span class="step-number">3</span>
+        <div>
+          <h2>分析預覽</h2>
+          <p>先確認系統抓到的數據，再進入正式公版輸出。</p>
+        </div>
+      </div>
+
+      <div class="analysis-grid">
+        <article class="analysis-panel">
+          <h3>測驗摘要</h3>
+          <div id="examSummary" class="metric-list"></div>
+        </article>
+        <article class="analysis-panel">
+          <h3>滿意度摘要</h3>
+          <div id="satSummary" class="metric-list"></div>
+        </article>
+      </div>
+
+      <div class="table-card">
+        <div class="table-title-row">
+          <h3>滿意度各項統計</h3>
+          <span class="table-note">滿意度＝平均分 ÷ 5 × 100%</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>項目</th>
+                <th>5分</th>
+                <th>4分</th>
+                <th>3分</th>
+                <th>2分</th>
+                <th>1分</th>
+                <th>平均</th>
+                <th>滿意度</th>
+              </tr>
+            </thead>
+            <tbody id="satTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-title-row">
+          <h3>測驗作答分布</h3>
+          <span class="table-note">不判斷正確答案，只呈現原始作答分布</span>
+        </div>
+        <div id="quizDistribution" class="distribution-list"></div>
+      </div>
+    </section>
+
+    <section class="step-card output-card hidden" id="outputStep">
+      <div class="step-heading">
+        <span class="step-number">4</span>
+        <div>
+          <h2>正式輸出</h2>
+          <p>下一階段接 Google Apps Script 後，這裡會產生院內既定公版 Excel。</p>
+        </div>
+      </div>
+      <button class="primary-btn" type="button" disabled>產生滿意度統計表（下一階段）</button>
+    </section>
+
+    <footer>
+      <button id="resetBtn" class="text-btn" type="button">清除並重新開始</button>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
