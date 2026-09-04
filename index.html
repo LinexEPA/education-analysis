@@ -52,7 +52,7 @@
         <span class="step-number">2</span>
         <div>
           <h2>貼上測驗題目與選項 <span class="optional">選填</span></h2>
-          <p>整份測驗一次貼上即可。建議依灰字範例標示，解析最穩定。</p>
+          <p>可直接從院內題庫或文件整段複製貼上，依灰字格式最穩定。</p>
         </div>
       </div>
 
@@ -60,11 +60,11 @@
         id="quizText"
         class="quiz-textarea"
         spellcheck="false"
-        placeholder="[Q1] 題目內容&#10;[A] 選項A&#10;[B] 選項B&#10;[C] 選項C&#10;[D] 選項D&#10;&#10;[Q2] 題目內容&#10;[O] 正確&#10;[X] 錯誤"
+        placeholder="1.火災啟動撥打雲端為？&#10;(1)3119&#10;(2)3333&#10;(3)3344&#10;(4)4310&#10;&#10;2.演練目的為加強災害發生時，醫院同仁能具備迅速緊急應變處置能力。&#10;(1)O&#10;(2)X"
       ></textarea>
 
       <div class="helper-row">
-        <span>選項也可使用 [1]～[4]、[O] / [X]。未貼題目仍可進行統計。</span>
+        <span>建議使用「1.題目」＋「(1)選項」格式；也相容 [Q1]、[A]～[D]、[O] / [X]。</span>
         <button id="parseQuizBtn" class="secondary-btn" type="button">解析題目</button>
       </div>
 
@@ -142,5 +142,6 @@
   </main>
 
   <script src="app.js"></script>
+  <script src="quiz-parser.js"></script>
 </body>
 </html>
