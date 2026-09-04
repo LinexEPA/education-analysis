@@ -7,6 +7,7 @@
   <title>教育訓練統計轉檔工具</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 </head>
 <body>
   <main class="page-shell">
@@ -24,7 +25,7 @@
         <span class="step-number">1</span>
         <div>
           <h2>上傳院內資料</h2>
-          <p>支援 .ods、.xlsx、.xls。姓名與身分證字號不會顯示在分析畫面。</p>
+          <p>支援 .ods、.xlsx、.xls。分析畫面不顯示個人姓名；正式 Excel 可保留姓名與作答明細，身分證字號不輸出。</p>
         </div>
       </div>
 
@@ -130,7 +131,7 @@
         <span class="step-number">4</span>
         <div>
           <h2>正式輸出</h2>
-          <p>下載 Excel，包含滿意度統計表與測驗統計。原始檔沒有的固定欄位會保留空白。</p>
+          <p>直接下載排版後 Excel：滿意度公版、個人作答明細、測驗題目統計；身分證字號不輸出。</p>
         </div>
       </div>
       <button id="exportBtn" class="primary-btn" type="button">下載教育訓練統計 Excel</button>
@@ -142,6 +143,7 @@
   </main>
 
   <script src="app.js"></script>
+  <script src="name-capture.js"></script>
   <script src="quiz-parser.js"></script>
   <script src="export.js"></script>
 </body>
