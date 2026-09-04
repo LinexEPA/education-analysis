@@ -77,7 +77,7 @@
         <span class="step-number">3</span>
         <div>
           <h2>分析預覽</h2>
-          <p>先確認系統抓到的數據，再進入正式公版輸出。</p>
+          <p>先確認系統抓到的數據，再進入正式輸出。</p>
         </div>
       </div>
 
@@ -130,10 +130,10 @@
         <span class="step-number">4</span>
         <div>
           <h2>正式輸出</h2>
-          <p>下一階段接 Google Apps Script 後，這裡會產生院內既定公版 Excel。</p>
+          <p>下載 Excel，包含滿意度統計表與測驗統計。原始檔沒有的固定欄位會保留空白。</p>
         </div>
       </div>
-      <button class="primary-btn" type="button" disabled>產生滿意度統計表（下一階段）</button>
+      <button id="exportBtn" class="primary-btn" type="button">下載教育訓練統計 Excel</button>
     </section>
 
     <footer>
@@ -143,5 +143,6 @@
 
   <script src="app.js"></script>
   <script src="quiz-parser.js"></script>
+  <script src="export.js"></script>
 </body>
 </html>
