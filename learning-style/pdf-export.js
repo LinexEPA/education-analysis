@@ -152,16 +152,18 @@
     drawWrapped(ctx, `可以直接問：${qs || '「你現在怎麼想？」／「下一次你會怎麼做？」'}`, 96, 1346, 1024, 31, 2);
 
     ctx.fillStyle = '#f6f3f8';
-    ctx.fillRect(72, 1474, 1096, 112);
+    ctx.fillRect(72, 1474, 1096, 102);
     ctx.fillStyle = '#4f5360';
     ctx.font = '600 22px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillText('存檔提醒', 94, 1496);
-    ctx.font = '400 21px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    drawWrapped(ctx, '請將本 PDF 儲存後，依書記指示掃描護理部雲端 QR Code 上傳，作為新進人員教育資料存檔。', 94, 1530, 1030, 30, 2);
+    ctx.fillText('存檔提醒', 94, 1494);
+    ctx.font = '400 20px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    drawWrapped(ctx, '請將本 PDF 儲存後，依書記指示掃描護理部雲端 QR Code 上傳，作為新進人員教育資料存檔。', 94, 1528, 1030, 28, 2);
 
-    ctx.font = '400 19px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.font = '400 17px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#777b8a';
-    drawWrapped(ctx, '學習偏好只是比較容易上手的方式，不代表能力高低；臨床安全、工作需要與實際表現仍然優先。', 82, 1628, 1080, 28, 2);
+    drawWrapped(ctx, '學習偏好只是比較容易上手的方式，不代表能力高低；臨床安全、工作需要與實際表現仍然優先。', 82, 1604, 1080, 25, 2);
+    drawWrapped(ctx, '理論架構參考：Memletics Learning Styles，Advanogy.com（2004），Learning-Styles-Online.com。', 82, 1650, 1080, 25, 2);
+    drawWrapped(ctx, '本測試網頁程式之使用與管理權限歸台中慈濟護理部教委會，僅供院內教育使用。', 82, 1696, 1080, 25, 2);
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
