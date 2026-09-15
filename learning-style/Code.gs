@@ -31,6 +31,7 @@ function doPost(e) {
       profile.testDate || '',
       String(profile.emp || ''),
       String(profile.unit || ''),
+      String(profile.education || ''),
       String(profile.birthMonth || ''),
       Number(profile.age || ''),
       String(profile.ageBand || ''),
