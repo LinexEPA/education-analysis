@@ -60,6 +60,7 @@
 
     const profile = result.profile || {};
     const scores = result.scores || {};
+    const guidance = window.__teachingGuidance || {};
     const radar = document.getElementById('radar');
     const advice = document.getElementById('advice')?.textContent?.trim() || '';
     const top = document.getElementById('topBadges')?.textContent?.replace(/\s+/g, ' ').trim() || '';
@@ -72,11 +73,12 @@
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, page.width, page.height);
     ctx.textBaseline = 'top';
-    ctx.fillStyle = '#2f3340';
-    ctx.font = '700 52px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillText('新進人員學習偏好分析', 86, 78);
 
-    ctx.font = '400 26px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.fillStyle = '#2f3340';
+    ctx.font = '700 50px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.fillText('新進人員學習偏好分析', 82, 68);
+
+    ctx.font = '400 25px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#676b78';
     const metaParts = [
       `員工編號：${profile.emp || ''}`,
@@ -84,66 +86,80 @@
       profile.education ? `學歷：${profile.education}` : '',
       `測驗日期：${profile.testDate || ''}`
     ].filter(Boolean);
-    ctx.fillText(metaParts.join('　｜　'), 88, 154);
+    ctx.fillText(metaParts.join('　｜　'), 84, 140);
 
     ctx.strokeStyle = '#e2dee8';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(86, 208);
-    ctx.lineTo(1154, 208);
+    ctx.moveTo(82, 194);
+    ctx.lineTo(1158, 194);
     ctx.stroke();
 
     ctx.fillStyle = '#2f3340';
-    ctx.font = '700 32px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillText('學習偏好雷達圖', 92, 246);
+    ctx.font = '700 30px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.fillText('學習偏好雷達圖', 86, 226);
+    ctx.fillText('七類分數', 704, 226);
 
-    // Canvas 可以直接作為 drawImage 來源，不經過非同步圖片載入。
-    // 這能保留 iPhone 點擊事件的 user activation，讓原生分享面板可靠開啟。
-    if (radar) ctx.drawImage(radar, 78, 302, 650, 650);
+    // 直接使用 Canvas，保留 iPhone 點擊事件的 user activation。
+    if (radar) ctx.drawImage(radar, 68, 278, 570, 570);
 
-    ctx.font = '700 32px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillStyle = '#2f3340';
-    ctx.fillText('七類分數', 770, 246);
-
-    let sy = 310;
+    let sy = 286;
     LABELS.forEach(([key, label]) => {
       ctx.fillStyle = '#f7f4fa';
-      ctx.fillRect(760, sy - 8, 390, 68);
+      ctx.fillRect(690, sy - 4, 466, 58);
       ctx.fillStyle = '#353944';
-      ctx.font = '600 24px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-      ctx.fillText(label, 780, sy + 10);
-      ctx.font = '800 28px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+      ctx.font = '600 22px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+      ctx.fillText(label, 712, sy + 11);
+      ctx.font = '800 25px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(`${Number(scores[key] || 0)}/20`, 1125, sy + 7);
+      ctx.fillText(`${Number(scores[key] || 0)}/20`, 1128, sy + 8);
       ctx.textAlign = 'left';
-      sy += 82;
+      sy += 66;
     });
 
     ctx.fillStyle = '#2f3340';
-    ctx.font = '700 30px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillText('較突出的偏好', 92, 1010);
-    ctx.font = '600 28px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.font = '700 28px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.fillText('較突出的偏好', 86, 876);
+    ctx.font = '700 26px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#6f5d83';
-    drawWrapped(ctx, top || '—', 92, 1056, 1060, 42, 2);
+    drawWrapped(ctx, top || '—', 86, 916, 1070, 36, 2);
 
     ctx.fillStyle = '#2f3340';
-    ctx.font = '700 30px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillText('學習建議', 92, 1162);
-    ctx.font = '400 26px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.font = '700 28px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.fillText('給學員的學習建議', 86, 990);
+    ctx.font = '400 23px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#4f5360';
-    drawWrapped(ctx, advice || '建議依較突出的偏好選擇適合的學習入口，並搭配其他方式交叉學習。', 92, 1210, 1060, 42, 5);
+    drawWrapped(ctx, advice || '建議依較突出的偏好選擇適合的學習入口，並搭配其他方式交叉學習。', 86, 1030, 1070, 34, 3);
+
+    ctx.fillStyle = '#f8f5fb';
+    ctx.fillRect(72, 1134, 1096, 318);
+    ctx.fillStyle = '#2f3340';
+    ctx.font = '700 29px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.fillText('給帶教老師的教學建議', 96, 1158);
+
+    ctx.font = '700 23px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.fillStyle = '#5d4e6a';
+    const teacherStart = guidance.start || '以學員較突出的偏好作為進入學習的入口，再依臨床任務與實際表現調整。';
+    drawWrapped(ctx, `建議起手式：${teacherStart}`, 96, 1202, 1024, 32, 2);
+
+    ctx.font = '400 22px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.fillStyle = '#4f5360';
+    drawWrapped(ctx, `帶教做法：${guidance.methods || '先給必要支架，再讓學員實作、說出理由，提供具體回饋並安排再次確認。'}`, 96, 1274, 1024, 31, 2);
+
+    const qs = Array.isArray(guidance.questions) ? guidance.questions.slice(0, 2).join('　／　') : '';
+    drawWrapped(ctx, `可直接問：${qs || '你目前的判斷依據是什麼？／下一次你會怎麼調整？'}`, 96, 1350, 1024, 31, 2);
 
     ctx.fillStyle = '#f6f3f8';
-    ctx.fillRect(86, 1450, 1068, 132);
+    ctx.fillRect(72, 1474, 1096, 112);
     ctx.fillStyle = '#4f5360';
-    ctx.font = '600 24px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillText('存檔提醒', 110, 1474);
-    ctx.font = '400 23px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    drawWrapped(ctx, '請將本 PDF 儲存後，依書記指示掃描護理部雲端 QR Code 上傳，作為新進人員教育資料存檔。', 110, 1514, 1010, 35, 2);
+    ctx.font = '600 22px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.fillText('存檔提醒', 94, 1496);
+    ctx.font = '400 21px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    drawWrapped(ctx, '請將本 PDF 儲存後，依書記指示掃描護理部雲端 QR Code 上傳，作為新進人員教育資料存檔。', 94, 1530, 1030, 30, 2);
 
-    ctx.font = '400 20px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.font = '400 19px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#777b8a';
-    drawWrapped(ctx, '本結果呈現學習偏好，作為教學與自我學習參考，不代表能力高低，也不是固定人格分類。', 88, 1640, 1060, 30, 2);
+    drawWrapped(ctx, '學習偏好是較容易進入學習的入口，不代表能力高低或固定人格；臨床任務、安全需求與實際表現仍優先。', 82, 1628, 1080, 28, 2);
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
@@ -155,8 +171,7 @@
   }
 
   async function savePdf(doc, filename) {
-    // iPhone/iPad 對 blob 下載常會出現「開啟外部應用程式」但沒有反應。
-    // 優先使用 iOS 原生分享面板，學員可直接選「儲存到檔案」。
+    // iPhone/iPad 的 blob 下載在部分內嵌瀏覽器不穩定，優先使用原生分享面板。
     if (isIOSDevice()) {
       const blob = doc.output('blob');
       const file = new File([blob], filename, { type: 'application/pdf' });
@@ -168,8 +183,6 @@
         return 'shared';
       }
 
-      // 少數內嵌瀏覽器沒有檔案分享 API：改為開啟 PDF 預覽。
-      // 若內嵌瀏覽器仍攔截，畫面會提示改用 Safari 開啟。
       const url = URL.createObjectURL(blob);
       const opened = window.open(url, '_blank');
       if (!opened) {
