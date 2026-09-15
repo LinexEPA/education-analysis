@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#f7f6fb" />
+  <title>新進人員學習偏好測驗</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <section id="intro" class="card">
+      <div class="eyebrow">NEW STAFF LEARNING PROFILE</div>
+      <h1>新進人員學習偏好測驗</h1>
+      <p class="sub">共 70 題，沒有標準答案。請依你平常最自然、最常出現的學習方式作答。</p>
+
+      <div class="field">
+        <label for="emp">員工編號</label>
+        <input id="emp" inputmode="numeric" autocomplete="off" placeholder="請輸入員工編號" />
+      </div>
+
+      <div class="field">
+        <label for="unit">單位</label>
+        <input id="unit" autocomplete="organization" placeholder="例如：11B" />
+      </div>
+
+      <div class="field">
+        <label>出生年月日</label>
+        <div class="dob">
+          <select id="year" aria-label="出生年"></select>
+          <select id="month" aria-label="出生月"></select>
+          <select id="day" aria-label="出生日"></select>
+        </div>
+        <p class="hint">完整日期只在你的裝置上用來計算年齡與星座；資料設計預設不保存「日」。</p>
+      </div>
+
+      <button class="btn" id="startBtn">開始測驗</button>
+      <p class="privacy">測驗結果描述的是學習偏好，不是能力高低，也不是固定人格分類。</p>
+    </section>
+
+    <section id="quiz" class="card hidden" aria-live="polite">
+      <div class="topline">
+        <span class="qnum" id="qnum"></span>
+        <span class="qtag" id="qtag">請選最符合你的程度</span>
+      </div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <div class="question" id="question"></div>
+      <div class="choices" id="choices"></div>
+      <div class="nav">
+        <button class="btn secondary" id="prevBtn">上一題</button>
+        <button class="btn" id="nextBtn">下一題</button>
+      </div>
+    </section>
+
+    <section id="result" class="card hidden">
+      <div class="eyebrow">YOUR LEARNING PROFILE</div>
+      <h1>你的學習偏好結果</h1>
+      <p class="sub" id="meta"></p>
+
+      <div class="result-grid">
+        <div class="chart-card"><canvas id="radar" width="560" height="560"></canvas></div>
+        <div>
+          <h2>七類分數</h2>
+          <div class="scores" id="scores"></div>
+          <h2 class="spaced">較突出的偏好</h2>
+          <div id="topBadges"></div>
+        </div>
+      </div>
+
+      <div class="note" id="advice"></div>
+      <p class="hint result-hint">建議把結果當成「比較容易進入學習的入口」，而不是限制自己只能用某一種方式學習。</p>
+      <div id="saveStatus" class="hint result-hint"></div>
+      <button class="btn secondary" id="restartBtn">重新作答</button>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script src="submit.js"></script>
+</body>
+</html>
