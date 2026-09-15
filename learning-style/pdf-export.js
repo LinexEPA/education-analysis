@@ -74,7 +74,7 @@
 
     ctx.fillStyle = '#2f3340';
     ctx.font = '700 50px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillText('新進人員學習偏好分析', 82, 62);
+    ctx.fillText('學習風格與偏好分析', 82, 62);
 
     ctx.font = '400 23px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#676b78';
@@ -169,7 +169,7 @@
     const imgData = page.toDataURL('image/jpeg', 0.92);
     doc.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
 
-    const filename = `${cleanFilePart(profile.emp)}_${cleanFilePart(profile.unit)}_${cleanFilePart(profile.testDate)}_學習偏好.pdf`;
+    const filename = `${cleanFilePart(profile.emp)}_${cleanFilePart(profile.unit)}_${cleanFilePart(profile.testDate)}_學習風格與偏好.pdf`;
     return { doc, filename };
   }
 
@@ -178,7 +178,7 @@
       const blob = doc.output('blob');
       const file = new File([blob], filename, { type: 'application/pdf' });
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: '新進人員學習偏好分析' });
+        await navigator.share({ files: [file], title: '學習風格與偏好分析' });
         return 'shared';
       }
 
