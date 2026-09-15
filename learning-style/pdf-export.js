@@ -18,9 +18,7 @@
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
 
-  if (isIOSDevice()) {
-    btn.textContent = '儲存／分享 PDF';
-  }
+  if (isIOSDevice()) btn.textContent = '儲存／分享 PDF';
 
   function cleanFilePart(value) {
     return String(value || '')
@@ -76,34 +74,39 @@
 
     ctx.fillStyle = '#2f3340';
     ctx.font = '700 50px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillText('新進人員學習偏好分析', 82, 68);
+    ctx.fillText('新進人員學習偏好分析', 82, 62);
 
-    ctx.font = '400 25px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.font = '400 23px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#676b78';
-    const metaParts = [
+    const metaLine1 = [
       `員工編號：${profile.emp || ''}`,
       `單位：${profile.unit || ''}`,
       profile.education ? `學歷：${profile.education}` : '',
       `測驗日期：${profile.testDate || ''}`
-    ].filter(Boolean);
-    ctx.fillText(metaParts.join('　｜　'), 84, 140);
+    ].filter(Boolean).join('　｜　');
+    ctx.fillText(metaLine1, 84, 132);
+
+    const metaLine2 = [
+      profile.ageBand ? `年齡層：${profile.ageBand}` : '',
+      profile.zodiac ? `星座：${profile.zodiac}` : ''
+    ].filter(Boolean).join('　｜　');
+    if (metaLine2) ctx.fillText(metaLine2, 84, 166);
 
     ctx.strokeStyle = '#e2dee8';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(82, 194);
-    ctx.lineTo(1158, 194);
+    ctx.moveTo(82, 210);
+    ctx.lineTo(1158, 210);
     ctx.stroke();
 
     ctx.fillStyle = '#2f3340';
     ctx.font = '700 30px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillText('學習偏好雷達圖', 86, 226);
-    ctx.fillText('七類分數', 704, 226);
+    ctx.fillText('學習偏好雷達圖', 86, 238);
+    ctx.fillText('七類分數', 704, 238);
 
-    // 直接使用 Canvas，保留 iPhone 點擊事件的 user activation。
-    if (radar) ctx.drawImage(radar, 68, 278, 570, 570);
+    if (radar) ctx.drawImage(radar, 68, 286, 570, 570);
 
-    let sy = 286;
+    let sy = 294;
     LABELS.forEach(([key, label]) => {
       ctx.fillStyle = '#f7f4fa';
       ctx.fillRect(690, sy - 4, 466, 58);
@@ -119,35 +122,34 @@
 
     ctx.fillStyle = '#2f3340';
     ctx.font = '700 28px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillText('較突出的偏好', 86, 876);
+    ctx.fillText('較突出的偏好', 86, 878);
     ctx.font = '700 26px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#6f5d83';
-    drawWrapped(ctx, top || '—', 86, 916, 1070, 36, 2);
+    drawWrapped(ctx, top || '—', 86, 918, 1070, 36, 2);
 
     ctx.fillStyle = '#2f3340';
     ctx.font = '700 28px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillText('給學員的學習建議', 86, 990);
+    ctx.fillText('給學員的學習建議', 86, 988);
     ctx.font = '400 23px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#4f5360';
-    drawWrapped(ctx, advice || '建議依較突出的偏好選擇適合的學習入口，並搭配其他方式交叉學習。', 86, 1030, 1070, 34, 3);
+    drawWrapped(ctx, advice || '可以先從自己比較容易上手的方式開始，再搭配其他方法一起學。', 86, 1028, 1070, 34, 3);
 
     ctx.fillStyle = '#f8f5fb';
-    ctx.fillRect(72, 1134, 1096, 318);
+    ctx.fillRect(72, 1130, 1096, 322);
     ctx.fillStyle = '#2f3340';
     ctx.font = '700 29px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    ctx.fillText('給帶教老師的教學建議', 96, 1158);
+    ctx.fillText('給帶教老師的小提醒', 96, 1154);
 
     ctx.font = '700 23px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#5d4e6a';
-    const teacherStart = guidance.start || '以學員較突出的偏好作為進入學習的入口，再依臨床任務與實際表現調整。';
-    drawWrapped(ctx, `建議起手式：${teacherStart}`, 96, 1202, 1024, 32, 2);
+    drawWrapped(ctx, `這位學員怎麼帶比較順？ ${guidance.start || '先從他比較容易上手的方式開始，再依實際表現調整。'}`, 96, 1198, 1024, 32, 2);
 
     ctx.font = '400 22px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#4f5360';
-    drawWrapped(ctx, `帶教做法：${guidance.methods || '先給必要支架，再讓學員實作、說出理由，提供具體回饋並安排再次確認。'}`, 96, 1274, 1024, 31, 2);
+    drawWrapped(ctx, `老師可以這樣做：${guidance.methods || '先示範或說明一小段，再讓學員自己做、自己說，當下給具體回饋。'}`, 96, 1272, 1024, 31, 2);
 
     const qs = Array.isArray(guidance.questions) ? guidance.questions.slice(0, 2).join('　／　') : '';
-    drawWrapped(ctx, `可直接問：${qs || '你目前的判斷依據是什麼？／下一次你會怎麼調整？'}`, 96, 1350, 1024, 31, 2);
+    drawWrapped(ctx, `可以直接問：${qs || '「你現在怎麼想？」／「下一次你會怎麼做？」'}`, 96, 1346, 1024, 31, 2);
 
     ctx.fillStyle = '#f6f3f8';
     ctx.fillRect(72, 1474, 1096, 112);
@@ -159,7 +161,7 @@
 
     ctx.font = '400 19px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#777b8a';
-    drawWrapped(ctx, '學習偏好是較容易進入學習的入口，不代表能力高低或固定人格；臨床任務、安全需求與實際表現仍優先。', 82, 1628, 1080, 28, 2);
+    drawWrapped(ctx, '學習偏好只是比較容易上手的方式，不代表能力高低；臨床安全、工作需要與實際表現仍然優先。', 82, 1628, 1080, 28, 2);
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
@@ -171,15 +173,11 @@
   }
 
   async function savePdf(doc, filename) {
-    // iPhone/iPad 的 blob 下載在部分內嵌瀏覽器不穩定，優先使用原生分享面板。
     if (isIOSDevice()) {
       const blob = doc.output('blob');
       const file = new File([blob], filename, { type: 'application/pdf' });
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: '新進人員學習偏好分析'
-        });
+        await navigator.share({ files: [file], title: '新進人員學習偏好分析' });
         return 'shared';
       }
 
@@ -207,7 +205,7 @@
 
       if (!status) return;
       if (action === 'shared') {
-        status.textContent = `PDF 已產生：${filename}。請在分享選單選擇「儲存到檔案」，或直接傳送至需要的位置。`;
+        status.textContent = `PDF 已產生：${filename}。建議優先選「儲存到檔案」，再依書記指示上傳護理部雲端。`;
       } else if (action === 'preview') {
         status.textContent = `PDF 已開啟預覽：${filename}。請從瀏覽器分享功能選擇「儲存到檔案」。`;
       } else {
