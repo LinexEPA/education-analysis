@@ -8,12 +8,12 @@
     const url = String(window.LEARNING_STYLE_SUBMIT_URL || '').trim();
     const token = String(window.LEARNING_STYLE_SUBMIT_TOKEN || '').trim();
     if (!url || !token) {
-      status.textContent = '目前為測試版：結果尚未寫入 Google Sheet。';
+      status.textContent = '目前為測試版：結果尚未連接後端資料表。';
       return;
     }
 
     sent = true;
-    status.textContent = '正在儲存結果…';
+    status.textContent = '正在送出測驗資料…';
 
     try {
       const payload = {
@@ -21,6 +21,8 @@
         token
       };
 
+      // Apps Script Web App 與 GitHub Pages 為跨網域，因此使用 no-cors 傳送。
+      // 瀏覽器只能確認請求已送出，無法讀取 Apps Script 回傳內容。
       await fetch(url, {
         method: 'POST',
         mode: 'no-cors',
@@ -28,10 +30,10 @@
         body: JSON.stringify(payload)
       });
 
-      status.textContent = '結果已送出。';
+      status.textContent = '資料已送出；測試階段請由管理者確認試算表是否收到。';
     } catch (err) {
       sent = false;
-      status.textContent = '結果儲存失敗，請通知管理者。';
+      status.textContent = '資料送出失敗，請通知管理者。';
       console.error(err);
     }
   }
