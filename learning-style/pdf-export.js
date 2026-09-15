@@ -159,12 +159,10 @@
     ctx.font = '400 19px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     drawWrapped(ctx, '請將本 PDF 儲存後，依書記指示掃描護理部雲端 QR Code 上傳，作為新進人員教育資料存檔。', 94, 1517, 1030, 26, 2);
 
-    ctx.font = '400 15px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.font = '400 16px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#777b8a';
-    drawWrapped(ctx, '學習偏好只是比較容易上手的方式，不代表能力高低；臨床安全、工作需要與實際表現仍然優先。', 82, 1582, 1080, 22, 2);
-    drawWrapped(ctx, '本工具為院內教育用途之自編學習偏好問卷；七類構面參考 Memletics Learning Styles 架構。題目、中文敘述、結果呈現與帶教建議均為重新設計，非 Memletics 官方中文版或授權測驗。', 82, 1622, 1080, 22, 2);
-    drawWrapped(ctx, '理論架構參考：Memletics Learning Styles，Advanogy.com（2004），Learning-Styles-Online.com。', 82, 1672, 1080, 22, 2);
-    drawWrapped(ctx, '管理權限：台中慈濟醫院護理部教學委員會具有本網頁之管理與院內使用權限。｜版本註記：2026/09/16', 82, 1710, 1080, 22, 2);
+    drawWrapped(ctx, '本結果僅作新進人員學習與帶教參考，不作心理診斷或能力判定。', 82, 1610, 1080, 24, 2);
+    drawWrapped(ctx, '官方網站：Learning-Styles-Online.com', 82, 1652, 1080, 24, 2);
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
