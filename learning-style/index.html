@@ -70,6 +70,13 @@
       <div class="note" id="advice"></div>
       <p class="hint result-hint">建議把結果當成「比較容易進入學習的入口」，而不是限制自己只能用某一種方式學習。</p>
       <div id="saveStatus" class="hint result-hint"></div>
+
+      <div class="archive-box">
+        <strong>完成後請存檔</strong>
+        <p>按「儲存 PDF」下載結果，再依書記指示掃描護理部雲端 QR Code 上傳，作為新進人員教育資料。</p>
+      </div>
+      <button class="btn" id="pdfBtn">儲存 PDF</button>
+      <div id="pdfStatus" class="hint result-hint"></div>
       <button class="btn secondary" id="restartBtn">重新作答</button>
     </section>
   </main>
@@ -78,5 +85,7 @@
   <script src="education.js"></script>
   <script src="app.js"></script>
   <script src="submit.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="pdf-export.js"></script>
 </body>
 </html>
