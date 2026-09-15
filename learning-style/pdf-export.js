@@ -13,6 +13,15 @@
     ['I', 'Solitary 獨立型']
   ];
 
+  function isIOSDevice() {
+    return /iPad|iPhone|iPod/i.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
+  if (isIOSDevice()) {
+    btn.textContent = '儲存／分享 PDF';
+  }
+
   function cleanFilePart(value) {
     return String(value || '')
       .trim()
@@ -44,7 +53,7 @@
     return y + lines.length * lineHeight;
   }
 
-  async function buildPdf() {
+  function buildPdf() {
     const result = window.__learningStyleResult;
     if (!result) throw new Error('尚未完成測驗');
     if (!window.jspdf || !window.jspdf.jsPDF) throw new Error('PDF 元件尚未載入，請重新整理後再試');
@@ -55,8 +64,6 @@
     const advice = document.getElementById('advice')?.textContent?.trim() || '';
     const top = document.getElementById('topBadges')?.textContent?.replace(/\s+/g, ' ').trim() || '';
 
-    // 先在瀏覽器 Canvas 產生完整 A4 頁面，再嵌入 PDF。
-    // 中文由瀏覽器字型渲染，因此不需把字型檔放進 PDF。
     const page = document.createElement('canvas');
     page.width = 1240;
     page.height = 1754;
@@ -90,16 +97,9 @@
     ctx.font = '700 32px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillText('學習偏好雷達圖', 92, 246);
 
-    if (radar) {
-      const radarImg = radar.toDataURL('image/png');
-      const img = new Image();
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = radarImg;
-      });
-      ctx.drawImage(img, 78, 302, 650, 650);
-    }
+    // Canvas 可以直接作為 drawImage 來源，不經過非同步圖片載入。
+    // 這能保留 iPhone 點擊事件的 user activation，讓原生分享面板可靠開啟。
+    if (radar) ctx.drawImage(radar, 78, 302, 650, 650);
 
     ctx.font = '700 32px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#2f3340';
@@ -151,19 +151,64 @@
     doc.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
 
     const filename = `${cleanFilePart(profile.emp)}_${cleanFilePart(profile.unit)}_${cleanFilePart(profile.testDate)}_學習偏好.pdf`;
+    return { doc, filename };
+  }
+
+  async function savePdf(doc, filename) {
+    // iPhone/iPad 對 blob 下載常會出現「開啟外部應用程式」但沒有反應。
+    // 優先使用 iOS 原生分享面板，學員可直接選「儲存到檔案」。
+    if (isIOSDevice()) {
+      const blob = doc.output('blob');
+      const file = new File([blob], filename, { type: 'application/pdf' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: '新進人員學習偏好分析'
+        });
+        return 'shared';
+      }
+
+      // 少數內嵌瀏覽器沒有檔案分享 API：改為開啟 PDF 預覽。
+      // 若內嵌瀏覽器仍攔截，畫面會提示改用 Safari 開啟。
+      const url = URL.createObjectURL(blob);
+      const opened = window.open(url, '_blank');
+      if (!opened) {
+        URL.revokeObjectURL(url);
+        throw new Error('此內嵌瀏覽器無法儲存 PDF，請用 Safari 開啟本頁後再試');
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      return 'preview';
+    }
+
     doc.save(filename);
-    return filename;
+    return 'downloaded';
   }
 
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     if (status) status.textContent = '正在產生 PDF…';
+
     try {
-      const filename = await buildPdf();
-      if (status) status.textContent = `PDF 已產生：${filename}`;
+      const { doc, filename } = buildPdf();
+      const action = await savePdf(doc, filename);
+
+      if (!status) return;
+      if (action === 'shared') {
+        status.textContent = `PDF 已產生：${filename}。請在分享選單選擇「儲存到檔案」，或直接傳送至需要的位置。`;
+      } else if (action === 'preview') {
+        status.textContent = `PDF 已開啟預覽：${filename}。請從瀏覽器分享功能選擇「儲存到檔案」。`;
+      } else {
+        status.textContent = `PDF 已下載：${filename}`;
+      }
     } catch (err) {
       console.error(err);
-      if (status) status.textContent = `PDF 產生失敗：${err.message || err}`;
+      if (status) {
+        if (err && err.name === 'AbortError') {
+          status.textContent = '已取消 PDF 儲存；需要時可再按一次。';
+        } else {
+          status.textContent = `PDF 產生失敗：${err.message || err}`;
+        }
+      }
     } finally {
       btn.disabled = false;
     }
