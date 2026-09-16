@@ -157,7 +157,7 @@
     ctx.font = '600 21px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillText('存檔提醒', 94, 1484);
     ctx.font = '400 19px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    drawWrapped(ctx, '請將本 PDF 儲存後，依書記指示掃描護理部雲端 QR Code 上傳，作為新進人員教育資料存檔。', 94, 1517, 1030, 26, 2);
+    drawWrapped(ctx, '本 PDF 產生時會同步送出至護理部雲端，依測驗月份歸檔；學員仍可自行在手機或電腦留存一份。', 94, 1517, 1030, 26, 2);
 
     ctx.font = '400 16px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#777b8a';
@@ -171,6 +171,39 @@
 
     const filename = `${cleanFilePart(profile.emp)}_${cleanFilePart(profile.unit)}_${cleanFilePart(profile.testDate)}_學習風格與偏好.pdf`;
     return { doc, filename };
+  }
+
+  async function backupPdf(doc, filename) {
+    const url = String(window.LEARNING_STYLE_SUBMIT_URL || '').trim();
+    const token = String(window.LEARNING_STYLE_SUBMIT_TOKEN || '').trim();
+    const result = window.__learningStyleResult || {};
+    const profile = result.profile || {};
+
+    if (!url || !token) return { sent: false, reason: 'not-configured' };
+
+    const dataUri = doc.output('datauristring');
+    const pdfBase64 = String(dataUri || '').split(',')[1] || '';
+    if (!pdfBase64) throw new Error('無法取得 PDF 備份內容');
+
+    await fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'backupPdf',
+        token,
+        filename,
+        profile: {
+          emp: profile.emp || '',
+          unit: profile.unit || '',
+          testDate: profile.testDate || ''
+        },
+        pdfBase64
+      })
+    });
+
+    // no-cors 無法讀取 Apps Script 回傳，因此只能確認瀏覽器已送出請求。
+    return { sent: true };
   }
 
   async function savePdf(doc, filename) {
@@ -196,31 +229,51 @@
     return 'downloaded';
   }
 
+  function localSaveMessage(action, filename) {
+    if (action === 'shared') return `PDF 已產生：${filename}。`;
+    if (action === 'preview') return `PDF 已開啟預覽：${filename}。`;
+    return `PDF 已下載：${filename}。`;
+  }
+
   btn.addEventListener('click', async () => {
     btn.disabled = true;
-    if (status) status.textContent = '正在產生 PDF…';
+    if (status) status.textContent = '正在產生 PDF 並送出雲端備份…';
 
     try {
       const { doc, filename } = buildPdf();
-      const action = await savePdf(doc, filename);
 
+      // 先啟動備份請求，但不等待，避免 iPhone 分享功能失去使用者點擊授權。
+      const backupPromise = backupPdf(doc, filename)
+        .catch(err => ({ sent: false, error: err }));
+
+      let action;
+      try {
+        action = await savePdf(doc, filename);
+      } catch (err) {
+        const backup = await backupPromise;
+        if (err && err.name === 'AbortError') {
+          if (status) {
+            status.textContent = backup.sent
+              ? '已取消手機端儲存／分享；雲端備份請求已送出。'
+              : '已取消手機端儲存／分享；雲端備份也未成功送出。';
+          }
+          return;
+        }
+        throw err;
+      }
+
+      const backup = await backupPromise;
       if (!status) return;
-      if (action === 'shared') {
-        status.textContent = `PDF 已產生：${filename}。建議優先選「儲存到檔案」，再依書記指示上傳護理部雲端。`;
-      } else if (action === 'preview') {
-        status.textContent = `PDF 已開啟預覽：${filename}。請從瀏覽器分享功能選擇「儲存到檔案」。`;
+
+      if (backup.sent) {
+        status.textContent = `${localSaveMessage(action, filename)} 雲端備份請求已送出，系統會依測驗月份歸檔。`;
       } else {
-        status.textContent = `PDF 已下載：${filename}`;
+        status.textContent = `${localSaveMessage(action, filename)} 但雲端備份未成功送出，請通知管理者。`;
+        if (backup.error) console.error(backup.error);
       }
     } catch (err) {
       console.error(err);
-      if (status) {
-        if (err && err.name === 'AbortError') {
-          status.textContent = '已取消 PDF 儲存；需要時可再按一次。';
-        } else {
-          status.textContent = `PDF 產生失敗：${err.message || err}`;
-        }
-      }
+      if (status) status.textContent = `PDF 產生或備份失敗：${err.message || err}`;
     } finally {
       btn.disabled = false;
     }
