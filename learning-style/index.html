@@ -3,63 +3,112 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#f7f6fb" />
+  <meta name="theme-color" content="#f7f4ef" />
   <title>學習風格與偏好</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20260916-2" />
 </head>
 <body>
   <main class="wrap">
-    <section id="intro" class="card">
-      <div class="eyebrow">NEW STAFF LEARNING PROFILE</div>
-      <h1>學習風格與偏好</h1>
-      <p class="sub">共 70 題，沒有標準答案。請依你平常最自然、最常出現的學習方式作答。</p>
-
-      <div class="field">
-        <label for="emp">員工編號</label>
-        <input id="emp" inputmode="numeric" autocomplete="off" placeholder="請輸入員工編號" />
-      </div>
-
-      <div class="field">
-        <label for="unit">單位</label>
-        <input id="unit" autocomplete="organization" placeholder="例如：11B" />
-      </div>
-
-      <div class="field">
-        <label>出生年月日</label>
-        <div class="dob">
-          <select id="year" aria-label="出生年"></select>
-          <select id="month" aria-label="出生月"></select>
-          <select id="day" aria-label="出生日"></select>
+    <section id="intro" class="card welcome-card">
+      <div class="welcome-grid">
+        <div class="welcome-copy">
+          <div class="eyebrow">NEW STAFF LEARNING PROFILE</div>
+          <h1>學習風格與偏好</h1>
+          <p class="lead">先認識自己比較容易進入學習的方式，讓之後的臨床學習更順一點。</p>
+          <div class="quick-tags" aria-label="測驗特色">
+            <span>70 題</span>
+            <span>沒有標準答案</span>
+            <span>依直覺作答即可</span>
+          </div>
+          <p class="sub">不用想哪個答案比較好，只要選最接近你平常學習時的樣子。</p>
         </div>
-        <p class="hint">完整日期只在你的裝置上用來計算年齡與星座；資料設計預設不保存「日」。</p>
+
+        <div class="welcome-visual" aria-hidden="true">
+          <div class="orbit orbit-a">看</div>
+          <div class="orbit orbit-b">聽</div>
+          <div class="orbit orbit-c">說</div>
+          <div class="orbit orbit-d">做</div>
+          <div class="orbit orbit-e">想</div>
+          <div class="orbit orbit-f">一起</div>
+          <div class="orbit orbit-g">自己</div>
+          <div class="visual-center">
+            <span>找到</span>
+            <strong>適合你的<br>學習入口</strong>
+          </div>
+        </div>
       </div>
 
-      <button class="btn" id="startBtn">開始測驗</button>
-      <p class="privacy">測驗結果描述的是學習偏好，不是能力高低，也不是固定人格分類。</p>
+      <div class="form-shell">
+        <div class="form-heading">
+          <span class="section-number">01</span>
+          <div>
+            <strong>先填基本資料</strong>
+            <small>完成後就會進入題目</small>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="emp">員工編號</label>
+          <input id="emp" inputmode="numeric" autocomplete="off" placeholder="請輸入員工編號" />
+        </div>
+
+        <div class="field">
+          <label for="unit">單位</label>
+          <input id="unit" autocomplete="organization" placeholder="例如：11B" />
+        </div>
+
+        <div class="field">
+          <label>出生年月日</label>
+          <div class="dob">
+            <select id="year" aria-label="出生年"></select>
+            <select id="month" aria-label="出生月"></select>
+            <select id="day" aria-label="出生日"></select>
+          </div>
+          <p class="hint">完整日期只在你的裝置上用來計算年齡與星座；資料設計預設不保存「日」。</p>
+        </div>
+
+        <button class="btn start-btn" id="startBtn"><span>開始測驗</span><span aria-hidden="true">→</span></button>
+        <p class="privacy">測驗結果描述的是學習偏好，不是能力高低，也不是固定人格分類。</p>
+      </div>
     </section>
 
-    <section id="quiz" class="card hidden" aria-live="polite">
+    <section id="quiz" class="card quiz-card hidden" aria-live="polite">
+      <div class="quiz-brand">學習風格與偏好</div>
       <div class="topline">
         <span class="qnum" id="qnum"></span>
         <span class="qtag" id="qtag">請選最符合你的程度</span>
       </div>
       <div class="progress"><div class="bar" id="bar"></div></div>
-      <div class="question" id="question"></div>
-      <div class="choices" id="choices"></div>
-      <div class="nav">
-        <button class="btn secondary" id="prevBtn">上一題</button>
-        <button class="btn" id="nextBtn">下一題</button>
+
+      <div class="question-shell">
+        <div class="question-mark" aria-hidden="true">✦</div>
+        <div class="question" id="question"></div>
+        <div class="choices" id="choices"></div>
       </div>
+
+      <div class="nav">
+        <button class="btn secondary" id="prevBtn">← 上一題</button>
+        <button class="btn" id="nextBtn">下一題 →</button>
+      </div>
+      <p class="quiz-footnote">照第一個直覺選就好，不需要反覆猜哪個答案比較「正確」。</p>
     </section>
 
-    <section id="result" class="card hidden">
-      <div class="eyebrow">YOUR LEARNING PROFILE</div>
-      <h1>你的學習風格與偏好結果</h1>
-      <p class="sub" id="meta"></p>
+    <section id="result" class="card result-card hidden">
+      <div class="result-head">
+        <div>
+          <div class="eyebrow">YOUR LEARNING PROFILE</div>
+          <h1>你的學習風格與偏好結果</h1>
+          <p class="sub" id="meta"></p>
+        </div>
+        <div class="result-stamp" aria-hidden="true">每一種方式<br>都能成為優勢</div>
+      </div>
 
       <div class="result-grid">
-        <div class="chart-card"><canvas id="radar" width="560" height="560"></canvas></div>
-        <div>
+        <div class="chart-card">
+          <div class="mini-title">學習風格雷達圖</div>
+          <canvas id="radar" width="560" height="560"></canvas>
+        </div>
+        <div class="score-panel">
           <h2>七類分數</h2>
           <div class="scores" id="scores"></div>
           <h2 class="spaced">較突出的偏好</h2>
@@ -67,8 +116,11 @@
         </div>
       </div>
 
-      <div class="note" id="advice"></div>
-      <p class="hint result-hint">建議把結果當成「比較容易進入學習的入口」，而不是限制自己只能用某一種方式學習。</p>
+      <section class="learner-box">
+        <div class="box-kicker">給你的學習建議</div>
+        <div class="note" id="advice"></div>
+        <p class="hint result-hint">把結果當成「比較容易進入學習的入口」，不是限制自己只能用某一種方式學習。</p>
+      </section>
 
       <section class="teacher-box" aria-labelledby="teacherTitle">
         <div class="teacher-kicker">給臨床帶教老師</div>
@@ -89,12 +141,17 @@
       <div id="saveStatus" class="hint result-hint"></div>
 
       <div class="archive-box">
-        <strong>PDF 會同步備份</strong>
-        <p>按「儲存／分享 PDF」時，系統會同步送出一份到護理部雲端，並依測驗月份歸檔；手機或電腦仍可自行留存一份。</p>
+        <div class="archive-icon" aria-hidden="true">↥</div>
+        <div>
+          <strong>PDF 會同步備份</strong>
+          <p>按「儲存／分享 PDF」時，系統會同步送出一份到護理部雲端，並依測驗月份歸檔；手機或電腦仍可自行留存一份。</p>
+        </div>
       </div>
-      <button class="btn" id="pdfBtn">儲存／分享 PDF</button>
+      <div class="result-actions">
+        <button class="btn" id="pdfBtn">儲存／分享 PDF</button>
+        <button class="btn secondary" id="restartBtn">重新作答</button>
+      </div>
       <div id="pdfStatus" class="hint result-hint"></div>
-      <button class="btn secondary" id="restartBtn">重新作答</button>
     </section>
 
     <footer class="site-footnote">
