@@ -1,8 +1,9 @@
 const SPREADSHEET_ID = '1oViteX1zUHDImka2oj4qqIFtpUDvDsOnfUkQuNQaSp0';
 const RESULT_SHEET = '測驗結果';
+const BACKUP_LOG_SHEET = '備份紀錄';
 const SUBMIT_TOKEN = 'xt5sNqkzln5pihFeAVq5jm1rvisnjnBM';
 const BACKUP_ROOT_FOLDER_ID = '1EO40xMk-2W-aTwQnqWqlZl39JkG0Hv-w';
-const APP_VERSION = '2026-09-16.3';
+const APP_VERSION = '2026-09-16.4';
 
 // 開啟 Web App /exec 網址時，只做連線檢查，不會寫入任何資料。
 function doGet() {
@@ -17,8 +18,9 @@ function doPost(e) {
   const lock = LockService.getScriptLock();
   lock.waitLock(15000);
 
+  let data = {};
   try {
-    const data = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+    data = JSON.parse((e && e.postData && e.postData.contents) || '{}');
 
     if (!data || data.token !== SUBMIT_TOKEN) {
       return jsonResponse_({ ok: false, error: 'unauthorized', version: APP_VERSION });
@@ -30,6 +32,9 @@ function doPost(e) {
 
     return saveAssessment_(data);
   } catch (err) {
+    if (data && data.action === 'backupPdf') {
+      logBackupSafely_('失敗', data, String(err));
+    }
     return jsonResponse_({ ok: false, error: String(err), version: APP_VERSION });
   } finally {
     lock.releaseLock();
@@ -65,7 +70,6 @@ function saveAssessment_(data) {
   const max = Math.max.apply(null, scorePairs.map(x => x[1]));
   const top = scorePairs.filter(x => x[1] >= max - 1).map(x => x[0]).join('、');
 
-  // 不依賴「目前開啟中的試算表」，直接指定正式資料表。
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sh = ss.getSheetByName(RESULT_SHEET);
   if (!sh) throw new Error('找不到工作表：' + RESULT_SHEET);
@@ -101,6 +105,8 @@ function backupPdf_(data) {
   const testDate = String(profile.testDate || '').trim();
   const pdfBase64 = String(data.pdfBase64 || '').replace(/^data:application\/pdf;base64,/, '');
 
+  logBackupSafely_('收到備份請求', data, '');
+
   if (!emp) throw new Error('PDF 備份缺少員工編號');
   if (!unit) throw new Error('PDF 備份缺少單位');
   if (!pdfBase64) throw new Error('PDF 備份內容為空');
@@ -122,6 +128,8 @@ function backupPdf_(data) {
   const blob = Utilities.newBlob(bytes, 'application/pdf', safeName);
   const file = monthFolder.createFile(blob);
 
+  logBackupSafely_('備份成功', data, `${monthName}/${safeName}`);
+
   return jsonResponse_({
     ok: true,
     action: 'backupPdf',
@@ -130,6 +138,27 @@ function backupPdf_(data) {
     fileId: file.getId(),
     version: APP_VERSION
   });
+}
+
+// 在 Apps Script 編輯器中手動執行一次。
+// 用途：觸發 Drive 權限授權，並確認目前部署帳號確實能寫入指定備份資料夾。
+function testBackupFolderAccess() {
+  const root = DriveApp.getFolderById(BACKUP_ROOT_FOLDER_ID);
+  const monthName = Utilities.formatDate(new Date(), 'Asia/Taipei', 'yyyy-MM');
+  const monthFolder = getOrCreateMonthFolder_(root, monthName);
+  const testName = `__backup_test_${Utilities.formatDate(new Date(), 'Asia/Taipei', 'yyyyMMdd_HHmmss')}.txt`;
+  const testFile = monthFolder.createFile(testName, 'backup test', MimeType.PLAIN_TEXT);
+  const result = {
+    ok: true,
+    rootFolder: root.getName(),
+    month: monthName,
+    testFileId: testFile.getId(),
+    version: APP_VERSION
+  };
+  logBackupSafely_('手動測試成功', { profile: { emp: 'TEST', unit: 'SYSTEM', testDate: monthName + '-01' }, filename: testName }, testName);
+  testFile.setTrashed(true);
+  Logger.log(JSON.stringify(result));
+  return result;
 }
 
 function monthFolderName_(testDate) {
@@ -164,6 +193,30 @@ function uniquePdfName_(folder, filename) {
   }
 
   return `${stem}_${Utilities.formatDate(new Date(), 'Asia/Taipei', 'HHmmss')}.pdf`;
+}
+
+function logBackupSafely_(status, data, detail) {
+  try {
+    const profile = (data && data.profile) || {};
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    let sh = ss.getSheetByName(BACKUP_LOG_SHEET);
+    if (!sh) {
+      sh = ss.insertSheet(BACKUP_LOG_SHEET);
+      sh.appendRow(['時間', '狀態', '員工編號', '單位', '測驗日期', '檔名', '詳細訊息', '版本']);
+    }
+    sh.appendRow([
+      new Date(),
+      status,
+      String(profile.emp || ''),
+      String(profile.unit || ''),
+      String(profile.testDate || ''),
+      String((data && data.filename) || ''),
+      String(detail || ''),
+      APP_VERSION
+    ]);
+  } catch (logErr) {
+    console.error('backup log failed', logErr);
+  }
 }
 
 function jsonResponse_(obj) {
