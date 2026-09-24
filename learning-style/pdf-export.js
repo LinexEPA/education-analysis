@@ -1,7 +1,8 @@
 (() => {
   const btn = document.getElementById('pdfBtn');
   const status = document.getElementById('pdfStatus');
-  if (!btn) return;
+  const resultPanel = document.getElementById('result');
+  if (!btn || !resultPanel) return;
 
   const LABELS = [
     ['V', 'Visual 視覺型'],
@@ -12,6 +13,9 @@
     ['S', 'Social 社交型'],
     ['I', 'Solitary 獨立型']
   ];
+
+  let autoBackupStarted = false;
+  let autoBackupFinished = false;
 
   function isIOSDevice() {
     return /iPad|iPhone|iPod/i.test(navigator.userAgent) ||
@@ -157,7 +161,7 @@
     ctx.font = '600 21px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillText('存檔提醒', 94, 1484);
     ctx.font = '400 19px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
-    drawWrapped(ctx, '本 PDF 產生時會同步送出至護理部雲端，依測驗月份歸檔；學員仍可自行在手機或電腦留存一份。', 94, 1517, 1030, 26, 2);
+    drawWrapped(ctx, '完成測驗並顯示分析結果後，系統會自動送出一份 PDF 至護理部雲端並依測驗月份歸檔；學員仍可自行在手機或電腦留存一份。', 94, 1517, 1030, 26, 2);
 
     ctx.font = '400 16px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#777b8a';
@@ -202,7 +206,6 @@
       })
     });
 
-    // no-cors 無法讀取 Apps Script 回傳，因此只能確認瀏覽器已送出請求。
     return { sent: true };
   }
 
@@ -235,45 +238,61 @@
     return `PDF 已下載：${filename}。`;
   }
 
-  btn.addEventListener('click', async () => {
-    btn.disabled = true;
-    if (status) status.textContent = '正在產生 PDF 並送出雲端備份…';
+  async function autoBackupIfReady() {
+    if (autoBackupStarted || resultPanel.classList.contains('hidden') || !window.__learningStyleResult) return;
+    autoBackupStarted = true;
+
+    if (status) status.textContent = '分析完成，正在自動備份 PDF 至護理部雲端…';
+
+    // 讓雷達圖與帶教建議先完成 DOM 更新，再產生歸檔 PDF。
+    await new Promise(resolve => setTimeout(resolve, 120));
 
     try {
       const { doc, filename } = buildPdf();
-
-      // 先啟動備份請求，但不等待，避免 iPhone 分享功能失去使用者點擊授權。
-      const backupPromise = backupPdf(doc, filename)
-        .catch(err => ({ sent: false, error: err }));
-
-      let action;
-      try {
-        action = await savePdf(doc, filename);
-      } catch (err) {
-        const backup = await backupPromise;
-        if (err && err.name === 'AbortError') {
-          if (status) {
-            status.textContent = backup.sent
-              ? '已取消手機端儲存／分享；雲端備份請求已送出。'
-              : '已取消手機端儲存／分享；雲端備份也未成功送出。';
-          }
-          return;
-        }
-        throw err;
-      }
-
-      const backup = await backupPromise;
-      if (!status) return;
+      const backup = await backupPdf(doc, filename);
 
       if (backup.sent) {
-        status.textContent = `${localSaveMessage(action, filename)} 雲端備份請求已送出，系統會依測驗月份歸檔。`;
+        autoBackupFinished = true;
+        if (status) status.textContent = 'PDF 雲端備份請求已自動送出，系統會依測驗月份歸檔。';
       } else {
-        status.textContent = `${localSaveMessage(action, filename)} 但雲端備份未成功送出，請通知管理者。`;
-        if (backup.error) console.error(backup.error);
+        autoBackupStarted = false;
+        if (status) status.textContent = '分析已完成，但雲端備份尚未設定，請通知管理者。';
       }
     } catch (err) {
+      autoBackupStarted = false;
       console.error(err);
-      if (status) status.textContent = `PDF 產生或備份失敗：${err.message || err}`;
+      if (status) status.textContent = `分析已完成，但 PDF 自動備份失敗：${err.message || err}`;
+    }
+  }
+
+  new MutationObserver(() => {
+    if (!resultPanel.classList.contains('hidden')) autoBackupIfReady();
+  }).observe(resultPanel, { attributes: true, attributeFilter: ['class'] });
+
+  // 若腳本載入時結果頁已經可見，也直接執行備份。
+  autoBackupIfReady();
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    if (status) {
+      status.textContent = autoBackupFinished
+        ? '正在產生可下載／分享的 PDF；雲端已自動備份。'
+        : '正在產生可下載／分享的 PDF；雲端備份會由系統自動處理。';
+    }
+
+    try {
+      const { doc, filename } = buildPdf();
+      const action = await savePdf(doc, filename);
+      if (status) {
+        status.textContent = `${localSaveMessage(action, filename)} 雲端歸檔不需再按此按鈕。`;
+      }
+    } catch (err) {
+      if (err && err.name === 'AbortError') {
+        if (status) status.textContent = '已取消手機端儲存／分享；不影響已自動送出的雲端備份。';
+        return;
+      }
+      console.error(err);
+      if (status) status.textContent = `PDF 產生或儲存失敗：${err.message || err}`;
     } finally {
       btn.disabled = false;
     }
