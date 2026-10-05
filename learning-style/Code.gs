@@ -3,9 +3,8 @@ const RESULT_SHEET = '測驗結果';
 const BACKUP_LOG_SHEET = '備份紀錄';
 const SUBMIT_TOKEN = 'xt5sNqkzln5pihFeAVq5jm1rvisnjnBM';
 const BACKUP_ROOT_FOLDER_ID = '1EO40xMk-2W-aTwQnqWqlZl39JkG0Hv-w';
-const APP_VERSION = '2026-09-16.4';
+const APP_VERSION = '2026-10-05.1';
 
-// 開啟 Web App /exec 網址時，只做連線檢查，不會寫入任何資料。
 function doGet() {
   return jsonResponse_({
     ok: true,
@@ -46,12 +45,12 @@ function saveAssessment_(data) {
   const answers = Array.isArray(data.answers) ? data.answers.slice(0, 70).map(Number) : [];
 
   if (!String(profile.emp || '').trim()) throw new Error('缺少員工編號');
+  if (!String(profile.name || '').trim()) throw new Error('缺少姓名');
   if (!String(profile.unit || '').trim()) throw new Error('缺少單位');
   if (answers.length !== 70 || answers.some(v => ![0, 1, 2].includes(v))) {
     throw new Error('70 題答案格式不完整');
   }
 
-  // 後端重新計分，不直接信任瀏覽器送來的分數。
   const keys = ['V', 'A', 'W', 'P', 'L', 'S', 'I'];
   const scores = {};
   keys.forEach((key, i) => {
@@ -78,6 +77,7 @@ function saveAssessment_(data) {
     new Date(),
     profile.testDate || '',
     String(profile.emp || ''),
+    String(profile.name || ''),
     String(profile.unit || ''),
     String(profile.education || ''),
     String(profile.birthMonth || ''),
@@ -101,6 +101,7 @@ function saveAssessment_(data) {
 function backupPdf_(data) {
   const profile = data.profile || {};
   const emp = String(profile.emp || '').trim();
+  const name = String(profile.name || '').trim();
   const unit = String(profile.unit || '').trim();
   const testDate = String(profile.testDate || '').trim();
   const pdfBase64 = String(data.pdfBase64 || '').replace(/^data:application\/pdf;base64,/, '');
@@ -108,10 +109,9 @@ function backupPdf_(data) {
   logBackupSafely_('收到備份請求', data, '');
 
   if (!emp) throw new Error('PDF 備份缺少員工編號');
+  if (!name) throw new Error('PDF 備份缺少姓名');
   if (!unit) throw new Error('PDF 備份缺少單位');
   if (!pdfBase64) throw new Error('PDF 備份內容為空');
-
-  // 約 5 MB PDF 的 base64 上限，避免公開 Web App 被拿來塞入過大的檔案。
   if (pdfBase64.length > 7000000) throw new Error('PDF 檔案過大');
 
   const bytes = Utilities.base64Decode(pdfBase64);
@@ -123,7 +123,7 @@ function backupPdf_(data) {
   const monthName = monthFolderName_(testDate);
   const monthFolder = getOrCreateMonthFolder_(root, monthName);
 
-  const requestedName = String(data.filename || `${emp}_${unit}_${testDate || monthName}_學習風格與偏好.pdf`);
+  const requestedName = String(data.filename || `${name}_${emp}_${unit}_${testDate || monthName}_學習風格與偏好.pdf`);
   const safeName = uniquePdfName_(monthFolder, sanitizePdfName_(requestedName));
   const blob = Utilities.newBlob(bytes, 'application/pdf', safeName);
   const file = monthFolder.createFile(blob);
@@ -140,8 +140,6 @@ function backupPdf_(data) {
   });
 }
 
-// 在 Apps Script 編輯器中手動執行一次。
-// 用途：觸發 Drive 權限授權，並確認目前部署帳號確實能寫入指定備份資料夾。
 function testBackupFolderAccess() {
   const root = DriveApp.getFolderById(BACKUP_ROOT_FOLDER_ID);
   const monthName = Utilities.formatDate(new Date(), 'Asia/Taipei', 'yyyy-MM');
@@ -155,7 +153,7 @@ function testBackupFolderAccess() {
     testFileId: testFile.getId(),
     version: APP_VERSION
   };
-  logBackupSafely_('手動測試成功', { profile: { emp: 'TEST', unit: 'SYSTEM', testDate: monthName + '-01' }, filename: testName }, testName);
+  logBackupSafely_('手動測試成功', { profile: { emp: 'TEST', name: 'TEST', unit: 'SYSTEM', testDate: monthName + '-01' }, filename: testName }, testName);
   testFile.setTrashed(true);
   Logger.log(JSON.stringify(result));
   return result;
@@ -202,12 +200,13 @@ function logBackupSafely_(status, data, detail) {
     let sh = ss.getSheetByName(BACKUP_LOG_SHEET);
     if (!sh) {
       sh = ss.insertSheet(BACKUP_LOG_SHEET);
-      sh.appendRow(['時間', '狀態', '員工編號', '單位', '測驗日期', '檔名', '詳細訊息', '版本']);
+      sh.appendRow(['時間', '狀態', '員工編號', '姓名', '單位', '測驗日期', '檔名', '詳細訊息', '版本']);
     }
     sh.appendRow([
       new Date(),
       status,
       String(profile.emp || ''),
+      String(profile.name || ''),
       String(profile.unit || ''),
       String(profile.testDate || ''),
       String((data && data.filename) || ''),
