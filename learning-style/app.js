@@ -34,11 +34,14 @@ function zodiac(m,d){
 }
 
 $('startBtn').addEventListener('click',()=>{
-  const emp=$('emp').value.trim(),unit=$('unit').value.trim(),y=+$('year').value,m=+$('month').value,d=+$('day').value;
-  if(!emp||!unit||!y||!m||!d){alert('請完成員工編號、單位及出生年月日。');return;}
+  const unit=$('unit').value.trim(),name=$('name').value.trim(),emp=$('emp').value.trim();
+  const education=$('education')?.value||'';
+  const y=+$('year').value,m=+$('month').value,d=+$('day').value;
+  if(!unit||!name||!emp||!y||!m||!d){alert('請完成單位、姓名、員工編號及出生年月日。');return;}
+  if(!education){alert('請選擇學歷。');return;}
   const birth=new Date(y,m-1,d),today=new Date(),age=ageOn(today,birth);
-  if(age<15||age>80){alert('請確認出生年月日是否正確。');return;}
-  state.profile={emp,unit,birthMonth:`${y}-${String(m).padStart(2,'0')}`,age,ageBand:ageBand(age),zodiac:zodiac(m,d),testDate:localISO(today)};
+  if(age<18||age>80){alert('請確認出生年月日是否正確。');return;}
+  state.profile={unit,name,emp,education,birthMonth:`${y}-${String(m).padStart(2,'0')}`,age,ageBand:ageBand(age),zodiac:zodiac(m,d),testDate:localISO(today)};
   $('intro').classList.add('hidden');$('quiz').classList.remove('hidden');renderQ();window.scrollTo({top:0,behavior:'smooth'});
 });
 
@@ -57,7 +60,7 @@ $('nextBtn').addEventListener('click',()=>{const idx=ORDER[state.i];if(state.ans
 function finish(){
   const totals={V:0,A:0,W:0,P:0,L:0,S:0,I:0};QUESTIONS.forEach(([t],i)=>totals[t]+=state.answers[i]);
   $('quiz').classList.add('hidden');$('result').classList.remove('hidden');
-  $('meta').textContent=`員工編號 ${state.profile.emp}｜${state.profile.unit}｜${state.profile.ageBand}｜${state.profile.zodiac}`;
+  $('meta').textContent=`${state.profile.name}｜${state.profile.unit}｜員工編號 ${state.profile.emp}｜${state.profile.education}｜${state.profile.ageBand}｜${state.profile.zodiac}`;
   $('scores').innerHTML=Object.entries(totals).map(([k,v])=>`<div class="score">${TYPES[k]} <b>${v}/20</b></div>`).join('');
   const max=Math.max(...Object.values(totals)),tops=Object.keys(totals).filter(k=>totals[k]>=max-1);
   $('topBadges').innerHTML=tops.map(k=>`<span class="badge">${TYPES[k]}</span>`).join('');$('advice').textContent=advice(tops);drawRadar(totals);
