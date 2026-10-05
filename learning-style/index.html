@@ -48,27 +48,32 @@
         </div>
 
         <div class="field">
-          <label for="emp">員工編號</label>
-          <input id="emp" inputmode="numeric" autocomplete="off" placeholder="請輸入員工編號" />
-        </div>
-
-        <div class="field">
           <label for="unit">單位</label>
           <input id="unit" autocomplete="organization" placeholder="例如：11B" />
         </div>
 
         <div class="field">
+          <label for="name">姓名</label>
+          <input id="name" autocomplete="name" placeholder="請輸入姓名" />
+        </div>
+
+        <div class="field">
+          <label for="emp">員工編號</label>
+          <input id="emp" inputmode="numeric" autocomplete="off" placeholder="請輸入員工編號" />
+        </div>
+
+        <div class="field" id="dobField">
           <label>出生年月日</label>
           <div class="dob">
             <select id="year" aria-label="出生年"></select>
             <select id="month" aria-label="出生月"></select>
             <select id="day" aria-label="出生日"></select>
           </div>
-          <p class="hint">完整日期只在你的裝置上用來計算年齡與星座；資料設計預設不保存「日」。</p>
+          <p class="hint">完整日期只在你的裝置上用來計算年齡與星座；系統不保存「日」。</p>
         </div>
 
         <button class="btn start-btn" id="startBtn"><span>開始測驗</span><span aria-hidden="true">→</span></button>
-        <p class="privacy">測驗結果描述的是學習偏好，不是能力高低，也不是固定人格分類。</p>
+        <p class="privacy">姓名、員工編號與單位會隨測驗結果存檔；結果描述的是學習偏好，不是能力高低，也不是固定人格分類。</p>
       </div>
     </section>
 
@@ -161,11 +166,11 @@
   </main>
 
   <script src="config.js"></script>
-  <script src="education.js"></script>
-  <script src="app.js"></script>
+  <script src="education.js?v=20261005-1"></script>
+  <script src="app.js?v=20261005-1"></script>
   <script src="teaching-guidance.js?v=20260916-3"></script>
   <script src="submit.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-  <script src="pdf-export.js?v=20260924-1"></script>
+  <script src="pdf-export.js?v=20261005-1"></script>
 </body>
 </html>
