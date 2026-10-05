@@ -3,7 +3,7 @@ const RESULT_SHEET = '測驗結果';
 const BACKUP_LOG_SHEET = '備份紀錄';
 const SUBMIT_TOKEN = 'xt5sNqkzln5pihFeAVq5jm1rvisnjnBM';
 const BACKUP_ROOT_FOLDER_ID = '1EO40xMk-2W-aTwQnqWqlZl39JkG0Hv-w';
-const APP_VERSION = '2026-10-05.1';
+const APP_VERSION = '2026-10-05.2';
 
 function doGet() {
   return jsonResponse_({
@@ -47,6 +47,7 @@ function saveAssessment_(data) {
   if (!String(profile.emp || '').trim()) throw new Error('缺少員工編號');
   if (!String(profile.name || '').trim()) throw new Error('缺少姓名');
   if (!String(profile.unit || '').trim()) throw new Error('缺少單位');
+  if (!String(profile.reportDate || '').trim()) throw new Error('缺少報到日');
   if (answers.length !== 70 || answers.some(v => ![0, 1, 2].includes(v))) {
     throw new Error('70 題答案格式不完整');
   }
@@ -76,6 +77,7 @@ function saveAssessment_(data) {
   sh.appendRow([
     new Date(),
     profile.testDate || '',
+    String(profile.reportDate || ''),
     String(profile.emp || ''),
     String(profile.name || ''),
     String(profile.unit || ''),
@@ -103,6 +105,7 @@ function backupPdf_(data) {
   const emp = String(profile.emp || '').trim();
   const name = String(profile.name || '').trim();
   const unit = String(profile.unit || '').trim();
+  const reportDate = String(profile.reportDate || '').trim();
   const testDate = String(profile.testDate || '').trim();
   const pdfBase64 = String(data.pdfBase64 || '').replace(/^data:application\/pdf;base64,/, '');
 
@@ -111,6 +114,7 @@ function backupPdf_(data) {
   if (!emp) throw new Error('PDF 備份缺少員工編號');
   if (!name) throw new Error('PDF 備份缺少姓名');
   if (!unit) throw new Error('PDF 備份缺少單位');
+  if (!reportDate) throw new Error('PDF 備份缺少報到日');
   if (!pdfBase64) throw new Error('PDF 備份內容為空');
   if (pdfBase64.length > 7000000) throw new Error('PDF 檔案過大');
 
@@ -123,7 +127,7 @@ function backupPdf_(data) {
   const monthName = monthFolderName_(testDate);
   const monthFolder = getOrCreateMonthFolder_(root, monthName);
 
-  const requestedName = String(data.filename || `${name}_${emp}_${unit}_${testDate || monthName}_學習風格與偏好.pdf`);
+  const requestedName = String(data.filename || `${unit}${name}-${emp}-${reportDate}.pdf`);
   const safeName = uniquePdfName_(monthFolder, sanitizePdfName_(requestedName));
   const blob = Utilities.newBlob(bytes, 'application/pdf', safeName);
   const file = monthFolder.createFile(blob);
@@ -153,7 +157,7 @@ function testBackupFolderAccess() {
     testFileId: testFile.getId(),
     version: APP_VERSION
   };
-  logBackupSafely_('手動測試成功', { profile: { emp: 'TEST', name: 'TEST', unit: 'SYSTEM', testDate: monthName + '-01' }, filename: testName }, testName);
+  logBackupSafely_('手動測試成功', { profile: { emp: 'TEST', name: 'TEST', unit: 'SYSTEM', reportDate: monthName + '-01', testDate: monthName + '-01' }, filename: testName }, testName);
   testFile.setTrashed(true);
   Logger.log(JSON.stringify(result));
   return result;
@@ -200,7 +204,7 @@ function logBackupSafely_(status, data, detail) {
     let sh = ss.getSheetByName(BACKUP_LOG_SHEET);
     if (!sh) {
       sh = ss.insertSheet(BACKUP_LOG_SHEET);
-      sh.appendRow(['時間', '狀態', '員工編號', '姓名', '單位', '測驗日期', '檔名', '詳細訊息', '版本']);
+      sh.appendRow(['時間', '狀態', '員工編號', '姓名', '單位', '測驗日期', '報到日', '檔名', '詳細訊息', '版本']);
     }
     sh.appendRow([
       new Date(),
@@ -209,6 +213,7 @@ function logBackupSafely_(status, data, detail) {
       String(profile.name || ''),
       String(profile.unit || ''),
       String(profile.testDate || ''),
+      String(profile.reportDate || ''),
       String((data && data.filename) || ''),
       String(detail || ''),
       APP_VERSION
