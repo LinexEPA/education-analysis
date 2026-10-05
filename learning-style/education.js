@@ -1,6 +1,6 @@
 (() => {
-  const unitField = document.getElementById('unit')?.closest('.field');
-  if (!unitField) return;
+  const dobField = document.getElementById('dobField') || document.getElementById('year')?.closest('.field');
+  if (!dobField) return;
 
   const field = document.createElement('div');
   field.className = 'field';
@@ -15,7 +15,7 @@
       <option value="碩班">碩班</option>
       <option value="博班">博班</option>
     </select>`;
-  unitField.insertAdjacentElement('afterend', field);
+  dobField.insertAdjacentElement('afterend', field);
 
   const startBtn = document.getElementById('startBtn');
   startBtn?.addEventListener('click', (e) => {
@@ -25,16 +25,4 @@
       alert('請選擇學歷。');
     }
   }, true);
-
-  const result = document.getElementById('result');
-  const addEducation = () => {
-    if (result?.classList.contains('hidden') || !window.__learningStyleResult) return;
-    const education = document.getElementById('education')?.value || '';
-    window.__learningStyleResult.profile.education = education;
-    const meta = document.getElementById('meta');
-    if (meta && education && !meta.textContent.includes(education)) {
-      meta.textContent += `｜${education}`;
-    }
-  };
-  new MutationObserver(addEducation).observe(result, {attributes:true, attributeFilter:['class']});
 })();
