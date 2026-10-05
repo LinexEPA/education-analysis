@@ -83,14 +83,15 @@
     ctx.font = '400 23px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
     ctx.fillStyle = '#676b78';
     const metaLine1 = [
+      profile.name ? `姓名：${profile.name}` : '',
       `員工編號：${profile.emp || ''}`,
       `單位：${profile.unit || ''}`,
-      profile.education ? `學歷：${profile.education}` : '',
       `測驗日期：${profile.testDate || ''}`
     ].filter(Boolean).join('　｜　');
     ctx.fillText(metaLine1, 84, 132);
 
     const metaLine2 = [
+      profile.education ? `學歷：${profile.education}` : '',
       profile.ageBand ? `年齡層：${profile.ageBand}` : '',
       profile.zodiac ? `星座：${profile.zodiac}` : ''
     ].filter(Boolean).join('　｜　');
@@ -173,7 +174,7 @@
     const imgData = page.toDataURL('image/jpeg', 0.92);
     doc.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
 
-    const filename = `${cleanFilePart(profile.emp)}_${cleanFilePart(profile.unit)}_${cleanFilePart(profile.testDate)}_學習風格與偏好.pdf`;
+    const filename = `${cleanFilePart(profile.name)}_${cleanFilePart(profile.emp)}_${cleanFilePart(profile.unit)}_${cleanFilePart(profile.testDate)}_學習風格與偏好.pdf`;
     return { doc, filename };
   }
 
@@ -199,6 +200,7 @@
         filename,
         profile: {
           emp: profile.emp || '',
+          name: profile.name || '',
           unit: profile.unit || '',
           testDate: profile.testDate || ''
         },
@@ -244,7 +246,6 @@
 
     if (status) status.textContent = '分析完成，正在自動備份 PDF 至護理部雲端…';
 
-    // 讓雷達圖與帶教建議先完成 DOM 更新，再產生歸檔 PDF。
     await new Promise(resolve => setTimeout(resolve, 120));
 
     try {
@@ -269,7 +270,6 @@
     if (!resultPanel.classList.contains('hidden')) autoBackupIfReady();
   }).observe(resultPanel, { attributes: true, attributeFilter: ['class'] });
 
-  // 若腳本載入時結果頁已經可見，也直接執行備份。
   autoBackupIfReady();
 
   btn.addEventListener('click', async () => {
