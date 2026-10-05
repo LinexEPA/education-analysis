@@ -84,16 +84,17 @@
     ctx.fillStyle = '#676b78';
     const metaLine1 = [
       profile.name ? `姓名：${profile.name}` : '',
-      `員工編號：${profile.emp || ''}`,
       `單位：${profile.unit || ''}`,
-      `測驗日期：${profile.testDate || ''}`
+      `員工編號：${profile.emp || ''}`,
+      profile.reportDate ? `報到日：${profile.reportDate}` : ''
     ].filter(Boolean).join('　｜　');
     ctx.fillText(metaLine1, 84, 132);
 
     const metaLine2 = [
       profile.education ? `學歷：${profile.education}` : '',
       profile.ageBand ? `年齡層：${profile.ageBand}` : '',
-      profile.zodiac ? `星座：${profile.zodiac}` : ''
+      profile.zodiac ? `星座：${profile.zodiac}` : '',
+      `測驗日期：${profile.testDate || ''}`
     ].filter(Boolean).join('　｜　');
     if (metaLine2) ctx.fillText(metaLine2, 84, 166);
 
@@ -174,7 +175,7 @@
     const imgData = page.toDataURL('image/jpeg', 0.92);
     doc.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
 
-    const filename = `${cleanFilePart(profile.name)}_${cleanFilePart(profile.emp)}_${cleanFilePart(profile.unit)}_${cleanFilePart(profile.testDate)}_學習風格與偏好.pdf`;
+    const filename = `${cleanFilePart(profile.unit)}${cleanFilePart(profile.name)}-${cleanFilePart(profile.emp)}-${cleanFilePart(profile.reportDate)}.pdf`;
     return { doc, filename };
   }
 
@@ -202,6 +203,7 @@
           emp: profile.emp || '',
           name: profile.name || '',
           unit: profile.unit || '',
+          reportDate: profile.reportDate || '',
           testDate: profile.testDate || ''
         },
         pdfBase64
