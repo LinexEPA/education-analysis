@@ -438,6 +438,7 @@ function renderQuizPreview() {
               <span>${escapeHtml(opt.text || '未辨識選項內容')}</span>
             </div>`).join('')}
         </div>
+        ${question.correctAnswer ? `<div class="status-line ok">已提供正確答案：${escapeHtml(question.correctAnswer)}</div>` : ''}
         ${warningText}
       </article>`;
   }).join('');
