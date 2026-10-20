@@ -80,6 +80,15 @@ els.parseQuizBtn.addEventListener('click', () => {
   if (state.rows.length) renderAnalysis();
 });
 
+els.quizPreview.addEventListener('change', event => {
+  const select = event.target.closest('select[data-quiz-answer-index]');
+  if (!select) return;
+  const index = Number(select.dataset.quizAnswerIndex);
+  const question = state.parsedQuiz[index];
+  if (!question) return;
+  question.correctAnswer = normalizeCode(select.value);
+});
+
 els.resetBtn.addEventListener('click', resetAll);
 
 async function handleFile(file) {
@@ -422,11 +431,17 @@ function renderQuizPreview() {
     setStatus(els.quizParseStatus, 'ok', `✓ 已辨識 ${parsed.length} 題，格式正常。`);
   }
 
-  els.quizPreview.innerHTML = parsed.map(question => {
+  els.quizPreview.innerHTML = parsed.map((question, index) => {
     const warningClass = question.warnings.length ? ' warning' : '';
     const warningText = question.warnings.length
       ? `<div class="status-line warn">⚠ ${escapeHtml(question.warnings.join('；'))}</div>`
       : '';
+    const answerOptions = question.options.map(opt => {
+      const code = normalizeCode(opt.code);
+      const selected = normalizeCode(question.correctAnswer) === code ? ' selected' : '';
+      const label = opt.text ? `${code}｜${opt.text}` : code;
+      return `<option value="${escapeHtml(code)}"${selected}>${escapeHtml(label)}</option>`;
+    }).join('');
 
     return `
       <article class="preview-item${warningClass}">
@@ -438,7 +453,14 @@ function renderQuizPreview() {
               <span>${escapeHtml(opt.text || '未辨識選項內容')}</span>
             </div>`).join('')}
         </div>
-        ${question.correctAnswer ? `<div class="status-line ok">已提供正確答案：${escapeHtml(question.correctAnswer)}</div>` : ''}
+        <div class="quiz-answer-row">
+          <label for="quizAnswer${index}">正確答案 <span class="optional">選填</span></label>
+          <select id="quizAnswer${index}" data-quiz-answer-index="${index}">
+            <option value="">留白，之後再補</option>
+            ${answerOptions}
+          </select>
+          <span>不選時 Excel／PDF 會留白；Excel 匯出後也可以再自行填寫。</span>
+        </div>
         ${warningText}
       </article>`;
   }).join('');
