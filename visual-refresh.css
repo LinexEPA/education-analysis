@@ -1,0 +1,442 @@
+/* Visual refresh 2026-10-20
+   只調整外觀，不改任何資料、解析、輸出或互動邏輯。
+   方向：編輯式／院內專業工具感，降低常見 AI SaaS 圓角卡片風格。 */
+
+:root {
+  --bg: #f4f2ed;
+  --surface: #fffefa;
+  --text: #273238;
+  --muted: #6f7779;
+  --line: #d8d5ce;
+  --primary: #235b62;
+  --primary-soft: #edf4f3;
+  --ok: #496b58;
+  --ok-soft: #eef3ef;
+  --warn: #98662d;
+  --warn-soft: #f7f1e7;
+  --danger: #9a4741;
+  --danger-soft: #f8eeec;
+  --shadow: none;
+  --radius: 5px;
+}
+
+body {
+  background:
+    linear-gradient(rgba(39,50,56,.025) 1px, transparent 1px),
+    var(--bg);
+  background-size: 100% 32px;
+  color: var(--text);
+  font-family: "Aptos", "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  letter-spacing: .005em;
+}
+
+.page-shell {
+  width: min(1030px, calc(100% - 44px));
+  padding: 34px 0 56px;
+}
+
+/* Hero：改成編輯式標題，不再像 SaaS dashboard */
+.hero {
+  position: relative;
+  align-items: flex-end;
+  gap: 28px;
+  margin-bottom: 22px;
+  padding: 5px 0 22px;
+  border-bottom: 2px solid var(--text);
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 132px;
+  height: 4px;
+  background: var(--primary);
+}
+
+.eyebrow {
+  margin-bottom: 8px;
+  color: var(--primary);
+  font-family: "Times New Roman", "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .16em;
+}
+
+h1, h2, h3,
+.sat-settings-summary strong,
+.report-meta-title strong {
+  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", "Times New Roman", serif;
+}
+
+h1 {
+  max-width: 760px;
+  font-size: clamp(30px, 4vw, 44px);
+  line-height: 1.18;
+  font-weight: 700;
+  letter-spacing: .025em;
+}
+
+h2 {
+  font-size: 20px;
+  letter-spacing: .015em;
+}
+
+h3 {
+  font-size: 16px;
+}
+
+.hero-copy {
+  max-width: 720px;
+  margin-top: 10px;
+  color: #697173;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.privacy-pill {
+  border: 1px solid #91a9a6;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--primary);
+  padding: 7px 9px;
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: .02em;
+}
+
+/* 主卡片：保留原本結構，拿掉「一堆柔和圓角卡」感 */
+.step-card {
+  position: relative;
+  background: rgba(255,254,250,.96);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  box-shadow: none;
+  padding: 23px 24px 24px;
+  margin-bottom: 16px;
+}
+
+.step-card::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 22px;
+  width: 3px;
+  height: 34px;
+  background: var(--primary);
+}
+
+.step-heading {
+  gap: 13px;
+  margin-bottom: 18px;
+}
+
+.step-heading p {
+  margin-top: 5px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #9aa3a4;
+  border-radius: 2px;
+  background: #f7f5f0;
+  color: var(--text);
+  font-family: "Times New Roman", serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.optional {
+  color: #8b8f90;
+  font-family: "Aptos", "Segoe UI", sans-serif;
+  font-weight: 500;
+}
+
+/* 上傳區 */
+.drop-zone {
+  min-height: 138px;
+  border: 1px dashed #aeb6b6;
+  border-radius: 3px;
+  background: #faf9f5;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+  border-color: var(--primary);
+  background: #f0f5f3;
+}
+
+.drop-icon {
+  color: var(--primary);
+  font-family: "Times New Roman", serif;
+}
+
+/* 狀態列不做膠囊 */
+.status-line {
+  border-radius: 2px;
+  border-left: 3px solid transparent;
+  padding: 8px 10px 8px 11px;
+}
+
+.status-line.muted { border-left-color: #b2b8b9; background: #f4f3ef; }
+.status-line.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.status-line.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.status-line.error { border-left-color: var(--danger); background: var(--danger-soft); }
+
+/* 摘要：改成資料列感，不做浮卡 */
+.summary-grid {
+  gap: 0;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.summary-card {
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+  padding: 15px 16px 14px;
+  background: transparent;
+}
+
+.summary-card:last-child { border-right: 0; }
+.summary-card span { font-size: 11.5px; letter-spacing: .03em; }
+.summary-card strong {
+  font-family: "Times New Roman", "Noto Serif TC", serif;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.check-panel,
+.report-meta-box {
+  border-radius: 3px;
+  background: #f7f6f2;
+  border-color: var(--line);
+}
+
+/* 輸入欄位 */
+.quiz-textarea,
+.sat-setting-row input,
+.report-meta-grid input,
+.quiz-answer-row select {
+  border-radius: 2px;
+  border-color: #bfc4c3;
+  background: #fffefa;
+}
+
+.quiz-textarea {
+  min-height: 205px;
+  padding: 15px;
+  line-height: 1.72;
+}
+
+.quiz-textarea:focus,
+.sat-setting-row input:focus,
+.report-meta-grid input:focus,
+.quiz-answer-row select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(35,91,98,.08);
+}
+
+/* 按鈕：較像正式工具，不用高圓角 */
+.primary-btn,
+.secondary-btn,
+.text-btn,
+.sat-preset-btn,
+.pdf-btn {
+  border-radius: 2px;
+  font-weight: 650;
+  letter-spacing: .015em;
+}
+
+.primary-btn {
+  background: #273238;
+  border-color: #273238;
+}
+
+.primary-btn:hover:not(:disabled) {
+  background: #11191d;
+  border-color: #11191d;
+}
+
+.secondary-btn {
+  border-color: #9fb4b2;
+  background: transparent;
+  color: var(--primary);
+}
+
+.secondary-btn:hover {
+  background: var(--primary-soft);
+}
+
+.text-btn {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* 題目預覽：像校稿頁 */
+.preview-list,
+.distribution-list {
+  gap: 12px;
+}
+
+.preview-item,
+.distribution-item {
+  border-radius: 3px;
+  border-color: var(--line);
+  padding: 15px 16px;
+  background: #fffefa;
+}
+
+.preview-item h4,
+.distribution-item h4 {
+  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.option-list {
+  gap: 7px;
+  padding-left: 2px;
+}
+
+.option-code {
+  min-width: 28px;
+  height: 23px;
+  border-radius: 2px;
+  background: #eceae4;
+  color: #40494c;
+  font-family: "Times New Roman", serif;
+  font-size: 12px;
+}
+
+.quiz-answer-row {
+  border-radius: 2px;
+  background: #f6f5f1;
+  border-color: #d6d3cc;
+}
+
+/* 分析區：表格／報表感 */
+.analysis-panel,
+.table-card {
+  border-radius: 3px;
+  border-color: var(--line);
+  background: #fffefa;
+}
+
+.metric-list {
+  gap: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.metric {
+  border-radius: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: #faf9f5;
+  padding: 11px 12px;
+}
+
+.metric strong {
+  font-family: "Times New Roman", "Noto Serif TC", serif;
+  font-size: 20px;
+}
+
+table {
+  background: #fffefa;
+}
+
+th {
+  background: #ebe9e3;
+  color: #394347;
+  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  font-weight: 700;
+}
+
+th, td {
+  border-bottom-color: #d9d6cf;
+}
+
+.bar-track {
+  height: 6px;
+  border-radius: 0;
+  background: #ddd9d1;
+}
+
+.bar-fill {
+  border-radius: 0;
+  background: var(--primary);
+}
+
+/* 滿意度設定 */
+.satisfaction-settings-card {
+  border-radius: 5px;
+}
+
+.sat-settings-summary {
+  padding: 17px 20px;
+}
+
+.sat-settings-body {
+  background: #f8f7f3;
+}
+
+.sat-preset-bar {
+  border-radius: 2px;
+  background: #f1f0eb;
+  border-color: #d5d2ca;
+}
+
+.sat-preset-btn {
+  border-color: #aaaead;
+  background: #fffefa;
+  color: #465154;
+}
+
+.sat-preset-btn.active {
+  border-color: var(--primary);
+  background: #e7efed;
+  color: var(--primary);
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+/* 報表資訊區 */
+.report-meta-box {
+  padding: 15px;
+}
+
+.report-meta-grid label span {
+  color: #555f61;
+  font-weight: 650;
+}
+
+.pdf-btn {
+  border-color: #69777a;
+  background: transparent;
+  color: #39474a;
+}
+
+footer {
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+@media (max-width: 820px) {
+  .page-shell { width: min(100% - 28px, 1030px); }
+  .summary-card:nth-child(2) { border-right: 0; }
+  .summary-card:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+}
+
+@media (max-width: 560px) {
+  .page-shell { width: min(100% - 20px, 1030px); padding-top: 22px; }
+  .hero { align-items: flex-start; }
+  .step-card { padding: 18px 16px 19px; }
+  .step-card::before { top: 18px; }
+  .summary-grid { grid-template-columns: 1fr 1fr; }
+  h1 { font-size: 31px; }
+}
