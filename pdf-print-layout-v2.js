@@ -41,7 +41,7 @@ async function exportCompletePdfV2() {
     // 2. 測驗作答分布：橫式，接在滿意度後面。
     const distributionChunks = chunkArrayV2(
       state.quizColumns.map((column, index) => ({ column, index })),
-      4
+      2
     );
     distributionChunks.forEach((chunk, index) => {
       if (!chunk.length) return;
@@ -163,8 +163,8 @@ function addCanvasToPdfV2(pdf, canvas) {
 }
 
 function createPdfPageV2(orientation) {
-  // 740px / 1068px 配合 A4 可列印寬度，使 16px 內文輸出後約等於 12pt。
-  const width = orientation === 'portrait' ? 740 : 1068;
+  // 直式維持原尺寸；橫式縮窄畫布，讓題目與作答分布在實際 PDF 中放大。
+  const width = orientation === 'portrait' ? 740 : 920;
   const wrapper = document.createElement('div');
   wrapper.style.cssText = [
     'position:fixed',
@@ -303,13 +303,13 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
   wrapper.innerHTML = `
     <style>
       ${basePdfStylesV2()}
-      .p2-sheet h2{font-size:28px!important;color:#111!important;margin-bottom:10px!important}
-      .p2-sub{font-size:18px!important;color:#111!important;margin-bottom:12px!important}
-      .p2-dist-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px}
+      .p2-sheet h2{font-size:30px!important;color:#111!important;margin-bottom:12px!important}
+      .p2-sub{font-size:20px!important;color:#111!important;margin-bottom:14px!important}
+      .p2-dist-grid{display:grid;grid-template-columns:1fr;gap:18px}
       .p2-dist-block{break-inside:avoid}
-      .p2-dist-block h3{margin:0 0 7px;font-size:18px;line-height:1.35;color:#111}
-      .p2-dist-table{font-size:16px}
-      .p2-dist-table th,.p2-dist-table td{padding:6px 7px}
+      .p2-dist-block h3{margin:0 0 8px;font-size:21px;line-height:1.42;color:#111}
+      .p2-dist-table{font-size:18px}
+      .p2-dist-table th,.p2-dist-table td{padding:7px 8px}
       .p2-dist-table th{background:#e7e7e7!important;color:#111!important}
       .p2-dist-table th:nth-child(1){width:15%}
       .p2-dist-table th:nth-child(2){width:55%}
@@ -414,48 +414,19 @@ function buildPdfPersonalSatisfactionV2(rowsChunk, allRows, group, groupIndex, g
 }
 
 function makeQuestionChunksV2(rows) {
-  const items = state.quizColumns.map((column, index) => {
-    const parsed = state.parsedQuiz[index];
-    const question = parsed?.question || column;
-    const options = parsed?.options?.length
-      ? parsed.options.map(option => `${option.code} ${option.text}`).join(' ')
-      : '';
-    return { column, index, weight: textUnitsV2(question) + textUnitsV2(options) };
-  });
-
-  const chunks = [];
-  let current = [];
-  let currentWeight = 0;
-
-  items.forEach(item => {
-    // 長題目獨立一頁；其他每頁最多 2 題。
-    const isLong = item.weight > 430;
-    if (isLong) {
-      if (current.length) chunks.push(current);
-      chunks.push([item]);
-      current = [];
-      currentWeight = 0;
-      return;
-    }
-
-    if (current.length >= 2 || (current.length && currentWeight + item.weight > 560)) {
-      chunks.push(current);
-      current = [];
-      currentWeight = 0;
-    }
-    current.push(item);
-    currentWeight += item.weight;
-  });
-
-  if (current.length) chunks.push(current);
-  return chunks;
+  // PDF 以閱讀性優先：每一題單獨一頁，避免為了塞兩題而縮小字體。
+  return state.quizColumns.map((column, index) => [{
+    column,
+    index,
+    weight: 0
+  }]);
 }
 
 function buildPdfQuestionsV2(rows, chunk, pageIndex, pageCount) {
   const wrapper = createPdfPageV2('landscape');
   const correctAnswers = typeof inferCorrectAnswers === 'function' ? inferCorrectAnswers(rows) : [];
   const code = cleanText(rows[0]?.['課程代碼'] || '').replace(/^'/, '');
-  const rowHeight = chunk.length === 1 ? 540 : 305;
+  const rowHeight = 450;
 
   const body = chunk.map(item => {
     const index = item.index;
@@ -486,11 +457,11 @@ function buildPdfQuestionsV2(rows, chunk, pageIndex, pageCount) {
   wrapper.innerHTML = `
     <style>
       ${basePdfStylesV2()}
-      .p2-sheet h2{font-size:29px!important;margin-bottom:14px!important;color:#111!important}
-      .p2-sub{font-size:19px!important;margin-bottom:12px!important;color:#111!important}
-      .p2-question{font-size:23px;line-height:1.48}
-      .p2-question th,.p2-question td{padding:11px 9px}
-      .p2-question th{font-size:22px;background:#e7e7e7!important;color:#111!important}
+      .p2-sheet h2{font-size:31px!important;margin-bottom:14px!important;color:#111!important}
+      .p2-sub{font-size:20px!important;margin-bottom:12px!important;color:#111!important}
+      .p2-question{font-size:26px;line-height:1.52}
+      .p2-question th,.p2-question td{padding:12px 10px}
+      .p2-question th{font-size:23px;background:#e7e7e7!important;color:#111!important}
       .p2-question th:nth-child(1){width:7%}
       .p2-question th:nth-child(2){width:10%}
       .p2-question th:nth-child(3){width:40%}
