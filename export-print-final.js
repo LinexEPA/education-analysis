@@ -246,6 +246,38 @@
     if (typeof applyBilingualFontsToWorksheet === 'function') applyBilingualFontsToWorksheet(ws);
   };
 
+  function quizPaperUsesAlphabeticCodes() {
+    const questions = (state.parsedQuiz || []).filter(question => question?.options?.length);
+    if (!questions.length) return false;
+
+    return questions.every(question =>
+      question.options.every((option, index) => {
+        const code = normalizeCode(option.code);
+        return code === String.fromCharCode(65 + index);
+      })
+    );
+  }
+
+  function quizPaperDisplayCorrect(parsed, rawCorrect, useAlphabetic) {
+    const raw = normalizeCode(rawCorrect);
+    if (!raw) return '';
+
+    let index = parsed?.options?.findIndex(option => normalizeCode(option.code) === raw) ?? -1;
+
+    if (index < 0 && /^\d+$/.test(raw)) {
+      const position = Number(raw) - 1;
+      if (position >= 0 && position < (parsed?.options?.length || 0)) index = position;
+    }
+
+    if (index < 0 && /^[A-Z]$/.test(raw)) {
+      const position = raw.charCodeAt(0) - 65;
+      if (position >= 0 && position < (parsed?.options?.length || 0)) index = position;
+    }
+
+    if (index < 0) return rawCorrect || '';
+    return useAlphabetic ? String.fromCharCode(65 + index) : String(index + 1);
+  }
+
   // ---------- 3. 教育訓練測驗題目 ----------
   buildQuestionSummaryWorksheet = function(workbook, rows) {
     if (!state.quizColumns.length) return;
@@ -292,11 +324,12 @@
     const correctAnswers = typeof inferCorrectAnswers === 'function'
       ? inferCorrectAnswers(rows)
       : state.quizColumns.map((_, index) => state.parsedQuiz?.[index]?.correctAnswer || '');
+    const useAlphabeticCodes = quizPaperUsesAlphabeticCodes();
 
     state.quizColumns.forEach((column, index) => {
       const parsed = state.parsedQuiz[index];
       const questionText = parsed?.question || column;
-      const correct = correctAnswers[index] || '';
+      const correct = quizPaperDisplayCorrect(parsed, correctAnswers[index] || '', useAlphabeticCodes);
 
       const answered = rows.map(row => cleanText(row[column])).filter(Boolean);
       let options = parsed?.options?.length
@@ -305,9 +338,12 @@
 
       if (!options.length) options = [{ code: '', text: '' }];
 
-      const optionText = options.map(option =>
-        option.text ? `(${option.code}) ${option.text}` : `(${option.code})`
-      ).join('\n');
+      const optionText = options.map((option, optionIndex) => {
+        const displayCode = useAlphabeticCodes
+          ? String.fromCharCode(65 + optionIndex)
+          : String(optionIndex + 1);
+        return option.text ? `(${displayCode}) ${option.text}` : `(${displayCode})`;
+      }).join('\n');
 
       const row = ws.addRow([
         `Q${index + 1}`,
