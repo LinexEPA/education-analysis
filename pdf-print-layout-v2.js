@@ -236,7 +236,7 @@ function buildPdfSatisfactionV2(rows) {
       .p2-sat th:nth-child(9){width:10%}.p2-sat th:nth-child(10){width:11%}
       .p2-sat tbody tr{height:45px}
       .p2-sign{display:grid;grid-template-columns:1fr 1fr 1.3fr;margin-top:12px;border:1px solid #777;border-right:0;font-size:16px}
-      .p2-sign div{border-right:1px solid #777;padding:8px;min-height:34px}
+      .p2-sign div{border-right:1px solid #777;padding:10px 8px;min-height:68px}
     </style>
     <div class="p2-sheet">
       <h1>佛教慈濟醫療財團法人台中慈濟醫院護理部</h1>
@@ -253,7 +253,7 @@ function buildPdfSatisfactionV2(rows) {
         <thead><tr><th>序</th><th>項目</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>總計</th><th>平均分數</th><th>滿意度</th></tr></thead>
         <tbody>${itemRows}</tbody>
       </table>
-      <div class="p2-sign"><div>製表人：</div><div>單位護理長：</div><div>單位督導：</div></div>
+      <div class="p2-sign"><div>製表人：${escapePdfV2(meta.preparer || '')}</div><div>單位護理長：</div><div>單位督導：</div></div>
     </div>`;
 
   applyMixedFontsPdfV2(wrapper);
