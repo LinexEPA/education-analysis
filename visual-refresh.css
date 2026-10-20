@@ -7,15 +7,15 @@
   --surface-soft: #fffcf8;
   --text: #51566b;
   --muted: #8a8fa3;
-  --line: #eee6f2;
-  --primary: #7f87df;
-  --primary-dark: #666ec4;
-  --primary-soft: #f1f0ff;
-  --pink: #f4a7bc;
-  --pink-soft: #fff0f5;
-  --mint: #79cdb7;
-  --mint-soft: #edf9f5;
-  --peach: #f6c98d;
+  --line: #e6ebe8;
+  --primary: #3f8f8b;
+  --primary-dark: #2f706d;
+  --primary-soft: #edf8f6;
+  --pink: #e99aa3;
+  --pink-soft: #fff1f1;
+  --mint: #76c7b5;
+  --mint-soft: #eef9f6;
+  --peach: #efbd7e;
   --peach-soft: #fff7e9;
   --ok: #579a7d;
   --ok-soft: #edf8f3;
@@ -23,8 +23,8 @@
   --warn-soft: #fff7e7;
   --danger: #c86e83;
   --danger-soft: #fff0f4;
-  --shadow: 0 14px 34px rgba(128, 113, 164, .11);
-  --shadow-soft: 0 8px 22px rgba(128, 113, 164, .08);
+  --shadow: 0 14px 34px rgba(73, 118, 111, .10);
+  --shadow-soft: 0 8px 22px rgba(73, 118, 111, .07);
   --radius: 22px;
 }
 
@@ -76,7 +76,7 @@ button, input, textarea, select {
   position: absolute;
   right: 26px;
   top: 16px;
-  color: rgba(127,135,223,.34);
+  color: rgba(63,143,139,.26);
   font-size: 15px;
   letter-spacing: 8px;
   pointer-events: none;
@@ -111,7 +111,7 @@ h1, h2, h3,
 h1 {
   max-width: 760px;
   margin: 0;
-  color: #5f64a3;
+  color: #356f6d;
   font-size: clamp(30px, 4vw, 42px);
   line-height: 1.2;
   font-weight: 700;
@@ -120,14 +120,14 @@ h1 {
 
 h2 {
   margin: 0;
-  color: #6368a6;
+  color: #397875;
   font-size: 21px;
   font-weight: 700;
 }
 
 h3 {
   margin: 0;
-  color: #676ca8;
+  color: #467f7b;
   font-size: 17px;
   font-weight: 700;
 }
@@ -144,10 +144,10 @@ h3 {
   position: relative;
   z-index: 1;
   flex: 0 0 auto;
-  border: 1px solid #dedbf8;
+  border: 1px solid #d4e8e4;
   border-radius: 999px;
   background: rgba(255,255,255,.9);
-  color: #7379bd;
+  color: #4a817d;
   padding: 9px 13px;
   font-size: 12px;
   font-weight: 600;
@@ -207,8 +207,8 @@ h3 {
   border: 0;
   border-radius: 999px;
   color: white;
-  background: linear-gradient(135deg, #8991e8 0%, #a790e4 100%);
-  box-shadow: 0 7px 16px rgba(127,135,223,.24);
+  background: linear-gradient(135deg, #4f9b96 0%, #70b9aa 100%);
+  box-shadow: 0 7px 16px rgba(63,143,139,.20);
   font-family: "Huninn", sans-serif;
   font-size: 16px;
   font-weight: 700;
@@ -264,7 +264,7 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 /* 上傳區 */
 .drop-zone {
   min-height: 145px;
-  border: 2px dashed #d7cdf0;
+  border: 2px dashed #c9ded9;
   border-radius: 20px;
   background: linear-gradient(180deg, #fff 0%, #fffbfe 100%);
   transition: .18s ease;
@@ -272,8 +272,8 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 
 .drop-zone:hover,
 .drop-zone.dragover {
-  border-color: #9aa2e9;
-  background: #faf8ff;
+  border-color: #6fa9a4;
+  background: #f2f8f6;
 }
 
 .drop-zone span {
@@ -304,14 +304,14 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 }
 
 .summary-card {
-  border: 1px solid #eee7f2;
+  border: 1px solid #e6ece9;
   border-radius: 18px;
   padding: 14px 15px;
   background: #fff;
   box-shadow: 0 6px 14px rgba(130,112,162,.055);
 }
 
-.summary-card:nth-child(1) { background: #fbf9ff; }
+.summary-card:nth-child(1) { background: #f5faf8; }
 .summary-card:nth-child(2) { background: #fff9fb; }
 .summary-card:nth-child(3) { background: #f8fcfb; }
 .summary-card:nth-child(4) { background: #fffaf2; }
@@ -324,7 +324,7 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 }
 
 .summary-card strong {
-  color: #676cae;
+  color: #3d7b77;
   font-family: "Huninn", sans-serif;
   font-size: 23px;
   font-weight: 700;
@@ -332,9 +332,9 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 
 .check-panel,
 .report-meta-box {
-  border: 1px solid #eee7f2;
+  border: 1px solid #e6ece9;
   border-radius: 18px;
-  background: #fcfbff;
+  background: #f8fbfa;
 }
 
 /* 輸入區 */
@@ -342,7 +342,7 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 .sat-setting-row input,
 .report-meta-grid input,
 .quiz-answer-row select {
-  border: 1.5px solid #e6ddef;
+  border: 1.5px solid #dce9e6;
   border-radius: 15px;
   color: var(--text);
   background: #fff;
@@ -360,8 +360,8 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 .sat-setting-row input:focus,
 .report-meta-grid input:focus,
 .quiz-answer-row select:focus {
-  border-color: #aaaee9;
-  box-shadow: 0 0 0 4px rgba(127,135,223,.09);
+  border-color: #83b7b1;
+  box-shadow: 0 0 0 4px rgba(63,143,139,.10);
 }
 
 .quiz-textarea::placeholder {
@@ -382,9 +382,9 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 
 .primary-btn {
   border: 0;
-  background: linear-gradient(135deg, #7f87df 0%, #9f88d9 100%);
+  background: linear-gradient(135deg, #4fa39e 0%, #6bb6a8 100%);
   color: white;
-  box-shadow: 0 8px 18px rgba(127,135,223,.22);
+  box-shadow: 0 8px 18px rgba(63,143,139,.18);
 }
 
 .primary-btn:hover:not(:disabled) {
@@ -394,19 +394,19 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 
 .secondary-btn,
 .pdf-btn {
-  border: 1px solid #ddd9f6;
+  border: 1px solid #d2e6e2;
   background: #faf9ff;
-  color: #6d72b6;
+  color: #4a7f7b;
 }
 
 .secondary-btn:hover,
 .pdf-btn:hover {
-  border-color: #bbbde9;
-  background: #f5f3ff;
+  border-color: #9ec8c3;
+  background: #edf7f5;
 }
 
 .text-btn {
-  color: #8d85ae;
+  color: #78817e;
 }
 
 /* 題目解析預覽 */
@@ -418,7 +418,7 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 
 .preview-item,
 .distribution-item {
-  border: 1px solid #eee7f2;
+  border: 1px solid #e6ece9;
   border-radius: 18px;
   padding: 15px 16px;
   background: #fff;
@@ -433,7 +433,7 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 .preview-item h4,
 .distribution-item h4 {
   margin: 0 0 9px;
-  color: #6469a4;
+  color: #467e79;
   font-size: 15.5px;
   line-height: 1.62;
   font-weight: 700;
@@ -454,7 +454,7 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
   min-width: 30px;
   height: 25px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #efedff, #fff1f6);
+  background: linear-gradient(135deg, #edf8f6, #fff3ef);
   color: #7477b4;
   font-family: "Huninn", sans-serif;
   font-size: 12px;
@@ -470,7 +470,7 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 /* 分析區 */
 .analysis-panel,
 .table-card {
-  border: 1px solid #eee7f2;
+  border: 1px solid #e6ece9;
   border-radius: 20px;
   background: #fff;
   box-shadow: 0 6px 16px rgba(130,112,162,.055);
@@ -482,7 +482,7 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 
 .metric {
   border-radius: 15px;
-  background: #faf9fe;
+  background: #f5faf8;
   padding: 10px;
 }
 
@@ -491,7 +491,7 @@ section.step-card:nth-of-type(2) .step-heading h2::before {
 }
 
 .metric strong {
-  color: #666cad;
+  color: #3f7a76;
   font-family: "Huninn", sans-serif;
   font-size: 19px;
   font-weight: 700;
@@ -502,8 +502,8 @@ table {
 }
 
 th {
-  background: linear-gradient(180deg, #f2f0ff, #faf8ff);
-  color: #686da9;
+  background: linear-gradient(180deg, #edf7f5, #f8fbfa);
+  color: #3f7a76;
   font-family: "Huninn", "Noto Sans TC", sans-serif;
   font-weight: 700;
 }
@@ -515,12 +515,12 @@ th, td {
 .bar-track {
   height: 8px;
   border-radius: 999px;
-  background: #ece8f5;
+  background: #e5efed;
 }
 
 .bar-fill {
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--mint), #8b93e6);
+  background: linear-gradient(90deg, #72c2ae, #55a5a0);
 }
 
 /* 滿意度切換 */
@@ -534,40 +534,40 @@ th, td {
 }
 
 .sat-settings-summary::after {
-  color: #8d86b5;
+  color: #7c8783;
 }
 
 .sat-settings-body {
-  border-top-color: #eee7f2;
-  background: #fffdfd;
+  border-top-color: #e6ece9;
+  background: #fffdf9;
 }
 
 .sat-preset-bar {
   border: 1px solid #eee3f2;
   border-radius: 16px;
-  background: #fbf9ff;
+  background: #f5faf8;
 }
 
 .sat-preset-label {
-  color: #9387b4;
+  color: #7c8783;
 }
 
 .sat-preset-btn {
-  border: 1px solid #dfd9ef;
+  border: 1px solid #d8e7e4;
   background: white;
-  color: #7377ac;
+  color: #4f807c;
 }
 
 .sat-preset-btn.active {
-  border-color: #a7addf;
-  background: linear-gradient(135deg, #efefff, #f4fbf8);
-  color: #656aa9;
-  box-shadow: 0 0 0 3px rgba(127,135,223,.08);
+  border-color: #8fbbb6;
+  background: linear-gradient(135deg, #eaf7f4, #fff5ef);
+  color: #3f7975;
+  box-shadow: 0 0 0 3px rgba(63,143,139,.08);
 }
 
 /* 報表資料設定 */
 .report-meta-title strong {
-  color: #666ba9;
+  color: #3f7975;
 }
 
 .report-meta-grid label span {
@@ -627,7 +627,7 @@ footer {
   width: 2px;
   border: 0;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(127,135,223,.38), rgba(244,167,188,.26), rgba(121,205,183,.28));
+  background: linear-gradient(180deg, rgba(63,143,139,.34), rgba(244,167,188,.26), rgba(121,205,183,.28));
   pointer-events: none;
 }
 
@@ -642,7 +642,7 @@ footer {
   width: 34px;
   height: 34px;
   border: 4px solid #fff9f6;
-  box-shadow: 0 4px 12px rgba(127,135,223,.18);
+  box-shadow: 0 4px 12px rgba(63,143,139,.16);
 }
 
 /* 每一大段以不同的淡色章節帶區隔，而不是框框 */
@@ -691,7 +691,7 @@ section.step-card:nth-of-type(2) {
 .summary-card:nth-child(3),
 .summary-card:nth-child(4) {
   border: 0;
-  border-right: 1px dashed #e6ddec;
+  border-right: 1px dashed #dce7e4;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
@@ -712,7 +712,7 @@ section.step-card:nth-of-type(2) {
 }
 
 .satisfaction-settings-card .sat-settings-details {
-  border-left: 4px solid #d6c8ee;
+  border-left: 4px solid #b9d9d4;
   background: linear-gradient(90deg, rgba(249,245,255,.92), rgba(255,255,255,.5));
   border-radius: 0 18px 18px 0;
 }
@@ -735,7 +735,7 @@ section.step-card:nth-of-type(2) {
 }
 
 .analysis-panel:first-child {
-  border-left: 5px solid #aeb4ee;
+  border-left: 5px solid #8fc8c1;
 }
 
 .analysis-panel:last-child {
@@ -761,7 +761,7 @@ section.step-card:nth-of-type(2) {
 }
 
 .metric + .metric {
-  border-left: 1px dashed #e8e0ec;
+  border-left: 1px dashed #e2e9e6;
 }
 
 /* 表格區像「紙張工作頁」，採切角而非標準圓卡 */
@@ -783,7 +783,7 @@ section.step-card:nth-of-type(2) {
   width: 5px;
   height: 42px;
   border-radius: 0 5px 5px 0;
-  background: linear-gradient(180deg,#aeb4ee,#f0b3c4);
+  background: linear-gradient(180deg,#8fc8c1,#eba8a2);
 }
 
 /* 題目預覽不再每題都是完整小卡，改成校稿條目 */
@@ -793,7 +793,7 @@ section.step-card:nth-of-type(2) {
 
 .preview-item {
   border: 0;
-  border-bottom: 1px dashed #e7deeb;
+  border-bottom: 1px dashed #e0e8e5;
   border-radius: 0;
   padding: 18px 4px 17px;
   background: transparent;
@@ -810,7 +810,7 @@ section.step-card:nth-of-type(2) {
 .distribution-item {
   border: 0;
   border-radius: 0;
-  border-bottom: 1px dashed #e7deeb;
+  border-bottom: 1px dashed #e0e8e5;
   background: transparent;
   box-shadow: none;
   padding: 14px 3px 16px;
@@ -866,7 +866,7 @@ section.step-card:nth-of-type(2) {
     border-right: 0;
   }
   .summary-card:nth-child(-n+2) {
-    border-bottom: 1px dashed #e6ddec;
+    border-bottom: 1px dashed #dce7e4;
   }
   .analysis-grid {
     grid-template-columns: 1fr;
@@ -874,4 +874,73 @@ section.step-card:nth-of-type(2) {
   .metric + .metric {
     border-left: 0;
   }
+}
+
+
+/* A3：降低紫色與霧感，改成清爽薄荷綠＋暖珊瑚，提升文字對比 */
+body {
+  color: #4a5357;
+  background:
+    radial-gradient(circle at 7% 5%, rgba(233,154,163,.13), transparent 20%),
+    radial-gradient(circle at 92% 8%, rgba(118,199,181,.13), transparent 20%),
+    linear-gradient(180deg, #fffdf9 0%, #fffaf5 58%, #fffdfb 100%);
+}
+
+.hero {
+  background:
+    radial-gradient(circle at 91% 15%, rgba(233,154,163,.11), transparent 24%),
+    radial-gradient(circle at 78% 92%, rgba(118,199,181,.12), transparent 22%),
+    rgba(255,255,255,.96);
+}
+
+.hero-copy,
+.step-heading p,
+.drop-zone span,
+.table-note,
+.helper-row span {
+  color: #747c80;
+}
+
+.step-card,
+.analysis-panel,
+.table-card,
+.preview-item,
+.distribution-item {
+  backdrop-filter: none;
+}
+
+#uploadStep {
+  background: linear-gradient(90deg, rgba(255,247,238,.72), rgba(255,255,255,0) 74%);
+}
+section.step-card:nth-of-type(2) {
+  background: linear-gradient(90deg, rgba(241,249,247,.86), rgba(255,255,255,0) 74%);
+}
+#analysisStep {
+  background: linear-gradient(90deg, rgba(238,248,245,.90), rgba(255,255,255,0) 74%);
+}
+#outputStep {
+  background: linear-gradient(90deg, rgba(255,242,241,.78), rgba(255,255,255,0) 74%);
+}
+
+.summary-card strong,
+.metric strong {
+  color: #347873;
+}
+
+.option-code {
+  color: #3e7e79;
+}
+
+th {
+  color: #3d7470;
+}
+
+.primary-btn {
+  color: #fff;
+}
+
+.secondary-btn,
+.pdf-btn,
+.sat-preset-btn {
+  color: #477b77;
 }
