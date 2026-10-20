@@ -269,7 +269,15 @@ function calculateExamSummary() {
 }
 
 function calculateSatisfaction() {
-  const items = state.satisfactionColumns.map((column, index) => {
+  // 一般院內格式可依「自訂題數」決定要納入前幾個滿意度欄位；
+  // Google 表單相容模式則維持原始偵測到的題數，不受網站預設 10 題限制。
+  const activeCount = window.__formResponseMode
+    ? state.satisfactionColumns.length
+    : Math.max(1, Number(window.__satActiveCount) || SAT_LABELS.length || state.satisfactionColumns.length);
+
+  const activeColumns = state.satisfactionColumns.slice(0, activeCount);
+
+  const items = activeColumns.map((column, index) => {
     const values = state.rows
       .map(row => toNumber(row[column]))
       .filter(value => value != null && value >= 1 && value <= 5);
@@ -284,10 +292,11 @@ function calculateSatisfaction() {
 
     const average = mean(values);
     const satisfaction = (average / 5) * 100;
+    const configuredLabel = String(SAT_LABELS[index] ?? '').trim();
 
     return {
       column,
-      label: SAT_LABELS[index] || column,
+      label: configuredLabel || `滿意度${index + 1}`,
       counts,
       average,
       satisfaction
