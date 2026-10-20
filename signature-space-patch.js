@@ -16,7 +16,7 @@
 
       if (signRowNumber) {
         const row = ws.getRow(signRowNumber);
-        row.height = 58;
+        row.height = 116;
         [1, 4, 7].forEach(col => {
           const cell = row.getCell(col);
           cell.alignment = { horizontal: 'left', vertical: 'top', wrapText: true };
@@ -33,7 +33,7 @@
       const style = document.createElement('style');
       style.textContent = `
         .pdf-sign div{
-          min-height:82px !important;
+          min-height:164px !important;
           padding:12px 12px !important;
           box-sizing:border-box;
           vertical-align:top;
