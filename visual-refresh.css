@@ -26,8 +26,8 @@ body {
     var(--bg);
   background-size: 100% 32px;
   color: var(--text);
-  font-family: "Aptos", "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  letter-spacing: .005em;
+  font-family: "Noto Sans TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "PingFang TC", sans-serif;
+  letter-spacing: .012em;
 }
 
 .page-shell {
@@ -66,16 +66,18 @@ body {
 
 h1, h2, h3,
 .sat-settings-summary strong,
-.report-meta-title strong {
-  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", "Times New Roman", serif;
+.report-meta-title strong,
+.preview-item h4,
+.distribution-item h4 {
+  font-family: "Noto Serif TC", "DFKai-SB", "BiauKai", "PMingLiU", serif;
 }
 
 h1 {
   max-width: 760px;
   font-size: clamp(30px, 4vw, 44px);
   line-height: 1.18;
-  font-weight: 700;
-  letter-spacing: .025em;
+  font-weight: 800;
+  letter-spacing: .035em;
 }
 
 h2 {
@@ -293,9 +295,9 @@ h3 {
 
 .preview-item h4,
 .distribution-item h4 {
-  font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 15.5px;
+  line-height: 1.62;
+  font-weight: 700;
 }
 
 .option-list {
@@ -439,4 +441,34 @@ footer {
   .step-card::before { top: 18px; }
   .summary-grid { grid-template-columns: 1fr 1fr; }
   h1 { font-size: 31px; }
+}
+
+
+/* 強化字體差異：標題採明顯襯線／楷體備援，操作文字維持清楚無襯線 */
+.step-heading h2,
+.table-title-row h3,
+.analysis-panel h3,
+.sat-settings-summary strong,
+.report-meta-title strong {
+  font-weight: 700;
+  letter-spacing: .035em;
+}
+
+.hero h1 {
+  text-wrap: balance;
+}
+
+.step-card,
+.analysis-panel,
+.table-card,
+.preview-item,
+.distribution-item {
+  border-color: #cbc7bd;
+}
+
+.primary-btn,
+.secondary-btn,
+.sat-preset-btn,
+.pdf-btn {
+  min-height: 36px;
 }
