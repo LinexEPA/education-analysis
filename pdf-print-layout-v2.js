@@ -47,23 +47,21 @@ async function exportCompletePdfV2() {
       });
     });
 
-    // 3. 個人滿意度明細：仍維持直式；10 題拆成前 5 / 後 5，確保 12pt 可讀性。
+    // 3. 個人滿意度明細：10 題全部放在同一頁寬度內；人數過多時只做縱向分頁，不拆題目。
     if (state.satisfactionColumns.length) {
-      const satGroups = chunkArrayV2(state.satisfactionColumns.map((column, index) => ({ column, index })), 5);
-      satGroups.forEach((group, groupIndex) => {
-        rowChunks.forEach((chunk, pageIndex) => {
-          sections.push({
-            orientation: 'portrait',
-            element: buildPdfPersonalSatisfactionV2(
-              chunk,
-              rows,
-              group,
-              groupIndex + 1,
-              satGroups.length,
-              pageIndex + 1,
-              rowChunks.length
-            )
-          });
+      const satGroup = state.satisfactionColumns.map((column, index) => ({ column, index }));
+      rowChunks.forEach((chunk, pageIndex) => {
+        sections.push({
+          orientation: 'portrait',
+          element: buildPdfPersonalSatisfactionV2(
+            chunk,
+            rows,
+            satGroup,
+            1,
+            1,
+            pageIndex + 1,
+            rowChunks.length
+          )
         });
       });
     }
@@ -311,15 +309,18 @@ function buildPdfPersonalSatisfactionV2(rowsChunk, allRows, group, groupIndex, g
   wrapper.innerHTML = `
     <style>
       ${basePdfStylesV2()}
+      .p2-personal-sat{font-size:16px}
+      .p2-personal-sat th,.p2-personal-sat td{padding:5px 3px}
       .p2-personal-sat tbody tr{height:39px}
-      .p2-personal-sat th:nth-child(1){width:7%}
-      .p2-personal-sat th:nth-child(2){width:14%}
-      .p2-personal-sat th:nth-child(3){width:20%}
+      .p2-personal-sat th:nth-child(1){width:5%}
+      .p2-personal-sat th:nth-child(2){width:12%}
+      .p2-personal-sat th:nth-child(3){width:15%}
+      .p2-personal-sat th:nth-child(n+4):nth-child(-n+${3 + group.length}){width:4.6%}
       ${isLastGroup ? '.p2-personal-sat th:last-child{width:22%}' : ''}
     </style>
     <div class="p2-sheet">
       <h2>教育訓練測驗－個人作答明細（滿意度）</h2>
-      <div class="p2-sub">課程代碼：${escapePdfV2(code)}　｜　滿意度題目 ${groupIndex}/${groupCount}${pageCount > 1 ? `　｜　人員 ${pageIndex}/${pageCount}` : ''}</div>
+      <div class="p2-sub">課程代碼：${escapePdfV2(code)}　｜　滿1～滿${group.length}＝滿意度題目${pageCount > 1 ? `　｜　人員 ${pageIndex}/${pageCount}` : ''}</div>
       <table class="p2-table p2-personal-sat">
         <thead><tr><th>序</th><th>姓名</th><th>單位</th>${headers}${isLastGroup ? '<th>感想與建議</th>' : ''}</tr></thead>
         <tbody>${body}</tbody>
