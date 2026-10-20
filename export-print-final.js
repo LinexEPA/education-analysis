@@ -112,22 +112,22 @@
     };
 
     ws.columns = [
-      { width: 8 }, { width: 53 }, { width: 12 },
-      { width: 44 }, { width: 10 }, { width: 11 }
+      { width: 8 }, { width: 48 }, { width: 11 },
+      { width: 38 }, { width: 9 }, { width: 10 }, { width: 14 }
     ];
 
-    ws.mergeCells('A1:F1');
+    ws.mergeCells('A1:G1');
     ws.getCell('A1').value = '教育訓練測驗作答分布';
     styleTitle(ws.getCell('A1'), 19);
     ws.getRow(1).height = 36;
 
-    ws.mergeCells('A2:F2');
+    ws.mergeCells('A2:G2');
     ws.getCell('A2').value = `課程代碼：${courseCode(rows)}　｜　呈現各選項實際作答人數與比例`;
     ws.getCell('A2').font = { name: 'DFKai-SB', size: 13, color: { argb: BLACK } };
     ws.getCell('A2').alignment = { horizontal: 'left', vertical: 'middle', indent: 1 };
     ws.getRow(2).height = 28;
 
-    const header = ws.addRow(['題號', '題目', '作答選項', '選項內容', '人數', '比例']);
+    const header = ws.addRow(['題號', '題目', '作答選項', '選項內容', '人數', '比例', '分布判讀']);
     styleHeaderRow(header);
 
     state.quizColumns.forEach((column, index) => {
@@ -158,14 +158,30 @@
         entries.push({ code: '', text: '', count: 0 });
       }
 
+      const counts = entries.map(item => item.count);
+      const maxCount = Math.max(...counts);
+      const minCount = Math.min(...counts);
+
       entries.forEach((item, answerIndex) => {
+        let distributionLabel = '';
+        if (entries.length === 1) {
+          distributionLabel = '唯一作答';
+        } else if (item.count === maxCount && item.count === minCount) {
+          distributionLabel = '最高＝最低';
+        } else if (item.count === maxCount) {
+          distributionLabel = '↑ 最高作答';
+        } else if (item.count === minCount) {
+          distributionLabel = '↓ 最低作答';
+        }
+
         const row = ws.addRow([
           answerIndex === 0 ? `Q${index + 1}` : '',
           answerIndex === 0 ? questionText : '',
           item.code,
           item.text,
           item.count,
-          total ? item.count / total : 0
+          total ? item.count / total : 0,
+          distributionLabel
         ]);
         styleDataRow(row);
         row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
@@ -175,6 +191,21 @@
         row.getCell(5).alignment = { horizontal: 'center', vertical: 'middle' };
         row.getCell(6).alignment = { horizontal: 'center', vertical: 'middle' };
         row.getCell(6).numFmt = '0.0%';
+        row.getCell(7).alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+
+        if (distributionLabel.includes('最高')) {
+          [5, 6, 7].forEach(col => {
+            row.getCell(col).font = { ...(row.getCell(col).font || {}), bold: true, color: { argb: BLACK } };
+            row.getCell(col).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: LIGHTER_GRAY } };
+          });
+        }
+        if (distributionLabel.includes('最低')) {
+          row.getCell(7).font = { ...(row.getCell(7).font || {}), bold: true, color: { argb: BLACK } };
+          row.getCell(7).border = {
+            ...(row.getCell(7).border || {}),
+            bottom: { style: 'double', color: { argb: BORDER } }
+          };
+        }
 
         const qLines = answerIndex === 0 ? estimateLinesFinal(questionText, 31) : 1;
         const oLines = estimateLinesFinal(item.text, 30);
@@ -182,7 +213,7 @@
       });
     });
 
-    ws.pageSetup.printArea = `A1:F${ws.rowCount}`;
+    ws.pageSetup.printArea = `A1:G${ws.rowCount}`;
     ws.pageSetup.printTitlesRow = '1:3';
     ws.headerFooter = {
       oddFooter: '&C第 &P 頁 / 共 &N 頁',
