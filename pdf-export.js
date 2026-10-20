@@ -341,7 +341,7 @@ function buildQuestionPdfReport(rows, chunk, chunkNumber, chunkTotal) {
     return `
       <tr>
         <td class="center num">Q${item.index + 1}</td>
-        <td class="center num correct">${escapePdfHtml(correct)}</td>
+        <td class="center num${correct ? ' correct' : ''}">${escapePdfHtml(correct)}</td>
         <td class="left top">${escapePdfHtml(item.questionText)}</td>
         <td class="left top">${optionsHtml}</td>
       </tr>`;
