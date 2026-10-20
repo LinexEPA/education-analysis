@@ -944,3 +944,241 @@ th {
 .sat-preset-btn {
   color: #477b77;
 }
+
+
+/* A4：Notion 感頁首
+   拿掉「大圓角卡片」第一印象，改成留白＋文字＋平面插圖。 */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr);
+  align-items: center;
+  gap: 46px;
+  margin: 2px 0 34px;
+  padding: 36px 4px 34px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.hero::before {
+  display: none;
+}
+
+.hero-copy-block {
+  position: relative;
+  z-index: 2;
+  padding-left: 2px;
+}
+
+.eyebrow {
+  margin-bottom: 12px;
+  color: #3f8f8b;
+  font-size: 12px;
+  letter-spacing: .10em;
+}
+
+.eyebrow::before {
+  color: #6fc2ae;
+}
+
+h1 {
+  max-width: 690px;
+  color: #26363a;
+  font-size: clamp(38px, 5vw, 56px);
+  line-height: 1.18;
+  letter-spacing: .015em;
+  font-weight: 700;
+}
+
+.hero-copy {
+  max-width: 640px;
+  margin-top: 15px;
+  color: #727b7f;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.privacy-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 18px;
+  color: #74817f;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.privacy-note span {
+  color: #e28f95;
+  font-size: 14px;
+}
+
+/* 平面小插圖：像工作頁，不做卡片堆疊 */
+.hero-visual {
+  position: relative;
+  min-height: 280px;
+}
+
+.hero-visual-wash {
+  position: absolute;
+  inset: 16px 0 8px 44px;
+  background: #fff1d8;
+  border-radius: 22px 0 22px 0;
+}
+
+.hero-sheet {
+  position: absolute;
+  left: 0;
+  right: 34px;
+  top: 64px;
+  bottom: 0;
+  padding: 24px 26px;
+  border: 1px solid #e7ece9;
+  border-radius: 16px 16px 4px 16px;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 14px 28px rgba(54,81,77,.09);
+  transform: rotate(-1.2deg);
+}
+
+.hero-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #3d4d50;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.hero-sheet-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  color: #4b918b;
+  background: #edf8f5;
+  font-size: 17px;
+}
+
+.hero-sheet-row {
+  display: grid;
+  grid-template-columns: 10px 1fr 72px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.hero-sheet-row i,
+.hero-sheet-row b {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: #edf0ee;
+}
+
+.hero-sheet-row b {
+  height: 24px;
+  background: #f7f5f0;
+  border: 1px solid #ece9e3;
+}
+
+.hero-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+.hero-dot.mint { background: #6fc2ae; }
+.hero-dot.coral { background: #e89a9f; }
+.hero-dot.gold { background: #edbd71; }
+
+.hero-sheet-chart {
+  display: flex;
+  align-items: end;
+  gap: 7px;
+  height: 54px;
+  margin: 22px 0 0 20px;
+}
+
+.hero-sheet-chart span {
+  width: 23px;
+  border-radius: 6px 6px 2px 2px;
+  background: #9ccfc4;
+}
+
+.hero-sheet-chart span:nth-child(1) { height: 23px; }
+.hero-sheet-chart span:nth-child(2) { height: 40px; background: #e8a5a8; }
+.hero-sheet-chart span:nth-child(3) { height: 31px; background: #edc57f; }
+.hero-sheet-chart span:nth-child(4) { height: 49px; background: #78b9b3; }
+
+.hero-spark {
+  position: absolute;
+  color: #6db6ad;
+  font-size: 15px;
+}
+
+.hero-spark.one {
+  right: 4px;
+  top: 26px;
+}
+
+.hero-spark.two {
+  right: 28px;
+  top: 56px;
+  color: #e5a3a5;
+  font-size: 13px;
+}
+
+/* 上傳資料標題：資料夾 icon 保留，但不再強調「院內」 */
+#uploadStep .step-heading h2::before {
+  content: "📁";
+}
+
+/* 讓第一個工作區接在 hero 後面，不像另一張大卡片 */
+#uploadStep {
+  margin-top: 0;
+  padding-top: 22px;
+  border-top: 1px solid #e5ece9;
+  background: transparent;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding-top: 24px;
+  }
+
+  .hero-visual {
+    min-height: 235px;
+  }
+
+  .hero-visual-wash {
+    inset: 8px 0 6px 26px;
+  }
+
+  .hero-sheet {
+    top: 42px;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    padding: 20px 0 26px;
+  }
+
+  h1 {
+    font-size: 34px;
+  }
+
+  .hero-visual {
+    min-height: 205px;
+  }
+
+  .hero-sheet {
+    right: 10px;
+    padding: 18px;
+  }
+}
