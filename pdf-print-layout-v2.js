@@ -287,7 +287,9 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
     const minCount = values.length ? Math.min(...values) : 0;
 
     const bars = entries.map(([codeValue, count]) => {
-      const label = labels[normalizeCode(codeValue)] || '';
+      const option = typeof findOption === 'function' ? findOption(parsed, codeValue) : null;
+      const displayCode = cleanText(option?.code || codeValue);
+      const label = cleanText(option?.text || labels[normalizeCode(codeValue)] || '');
       const pct = total ? (count / total) * 100 : 0;
       let flag = '';
       if (entries.length === 1) flag = '唯一作答';
@@ -297,7 +299,7 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
 
       return `
         <div class="p2-bar-row">
-          <div class="p2-bar-code p2-num">${escapePdfV2(codeValue)}.</div>
+          <div class="p2-bar-code p2-num">${escapePdfV2(displayCode)}.</div>
           <div class="p2-bar-label">${escapePdfV2(label)}</div>
           <div class="p2-bar-track"><div class="p2-bar-fill" style="width:${pct.toFixed(1)}%"></div></div>
           <div class="p2-bar-value p2-num">${count}人 · ${pct.toFixed(1)}%</div>
