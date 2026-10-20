@@ -287,7 +287,7 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
     const minCount = values.length ? Math.min(...values) : 0;
 
     const bars = entries.map(([codeValue, count]) => {
-      const option = typeof findOption === 'function' ? findOption(parsed, codeValue) : null;
+      const option = typeof findOptionForResponse === 'function' ? findOptionForResponse(parsed, codeValue) : (typeof findOption === 'function' ? findOption(parsed, codeValue) : null);
       const displayCode = cleanText(option?.code || codeValue);
       const label = cleanText(option?.text || labels[normalizeCode(codeValue)] || '');
       const pct = total ? (count / total) * 100 : 0;
