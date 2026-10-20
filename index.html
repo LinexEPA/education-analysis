@@ -219,5 +219,12 @@
   <script src="signature-space-patch.js?v=20261020-6"></script>
   <script src="form-response-compat.js?v=20261020-6"></script>
   <script src="export-print-final.js?v=20261020-4"></script>
+  <script>
+    // 瀏覽器預設會記住重新整理前的捲動位置；本工具改成每次重新載入從頁首開始。
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.addEventListener('pageshow', () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    });
+  </script>
 </body>
 </html>
