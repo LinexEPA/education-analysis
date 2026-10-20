@@ -1680,3 +1680,82 @@ h1 {
     font-size: 9px;
   }
 }
+
+
+/* A13：題目解析後的正確答案輸入更醒目 */
+.quiz-answer-row {
+  display: grid;
+  grid-template-columns: minmax(170px, 220px) minmax(220px, 1fr);
+  grid-template-areas:
+    "label select"
+    "help help";
+  align-items: center;
+  gap: 9px 14px;
+  margin-top: 16px;
+  padding: 13px 14px;
+  border: 1.5px solid #9fcfc6;
+  border-left: 5px solid #4f9f97;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #edf8f5 0%, #fffdf9 72%);
+  box-shadow: 0 5px 14px rgba(63,143,139,.07);
+}
+
+.quiz-answer-label {
+  grid-area: label;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #356f6b;
+  font-weight: 700;
+}
+
+.quiz-answer-label label {
+  color: #356f6b;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.quiz-answer-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 999px;
+  color: #fff;
+  background: #4f9f97;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.quiz-answer-row select {
+  grid-area: select;
+  min-height: 40px;
+  border: 1.5px solid #89bbb4;
+  border-radius: 11px;
+  background: #fff;
+  color: #33484a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.quiz-answer-row select:focus {
+  border-color: #3f8f8b;
+  box-shadow: 0 0 0 4px rgba(63,143,139,.10);
+}
+
+.quiz-answer-help {
+  grid-area: help;
+  color: #77817f;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .quiz-answer-row {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "label"
+      "select"
+      "help";
+  }
+}
