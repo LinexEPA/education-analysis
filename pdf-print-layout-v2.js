@@ -394,7 +394,7 @@ function buildPdfQuestionsV2(rows, chunk, pageIndex, pageCount) {
     return `
       <tr style="height:${rowHeight}px">
         <td class="p2-center p2-num">Q${index + 1}</td>
-        <td class="p2-center p2-num p2-green">${escapePdfV2(correct)}</td>
+        <td class="p2-center p2-num${correct ? ' p2-green' : ''}">${escapePdfV2(correct)}</td>
         <td class="p2-left p2-top">${escapePdfV2(question)}</td>
         <td class="p2-left p2-top">${optionHtml}</td>
       </tr>`;
