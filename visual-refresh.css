@@ -1182,3 +1182,149 @@ h1 {
     padding: 18px;
   }
 }
+
+
+/* A5：主標題設計感
+   保留使用者指定的兩層結構：
+   護理部教育訓練
+   測驗與滿意度統計轉檔工具
+   主標題整行不切斷，只在文字本身加入輕量設計元素。 */
+
+.hero-kicker {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: fit-content;
+  margin: 0 0 13px;
+  color: #3f8f8b;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.hero-kicker-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 8px 8px 3px 8px;
+  color: #fff;
+  background: #69b7aa;
+  font-size: 11px;
+  transform: rotate(-4deg);
+}
+
+.hero-kicker-line {
+  width: 54px;
+  height: 1px;
+  margin-left: 2px;
+  background: linear-gradient(90deg, #7fc6ba, rgba(127,198,186,0));
+}
+
+.hero-title {
+  position: relative;
+  max-width: none;
+  margin: 0;
+  color: #26363a;
+  font-size: clamp(36px, 4.45vw, 52px);
+  line-height: 1.18;
+  font-weight: 700;
+  letter-spacing: .006em;
+}
+
+.hero-title-nowrap {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.hero-title-accent {
+  position: relative;
+  display: inline-block;
+  z-index: 1;
+}
+
+.hero-title-accent::after {
+  content: "";
+  position: absolute;
+  left: -3%;
+  right: -3%;
+  bottom: .08em;
+  height: .22em;
+  border-radius: 999px;
+  z-index: -1;
+  opacity: .85;
+}
+
+.hero-title-accent.quiz::after {
+  background: #bfe5dc;
+  transform: rotate(-1.5deg);
+}
+
+.hero-title-accent.satisfaction::after {
+  background: #f7c5c5;
+  transform: rotate(1deg);
+}
+
+.hero-title-join {
+  display: inline-block;
+  margin: 0 .08em;
+  color: #7b8584;
+  font-size: .72em;
+  font-weight: 500;
+  vertical-align: .08em;
+}
+
+.hero-title-rest {
+  position: relative;
+  display: inline-block;
+  margin-left: .10em;
+}
+
+.hero-title-rest::before {
+  content: "●";
+  display: inline-block;
+  margin: 0 .20em .08em .02em;
+  color: #efbd71;
+  font-size: .24em;
+  vertical-align: middle;
+}
+
+.hero-title-rest::after {
+  content: "✦";
+  position: absolute;
+  right: -.62em;
+  top: -.14em;
+  color: #79bdb2;
+  font-size: .28em;
+  font-weight: 400;
+  transform: rotate(10deg);
+}
+
+@media (max-width: 760px) {
+  .hero-title {
+    font-size: clamp(29px, 7.1vw, 40px);
+    letter-spacing: 0;
+  }
+
+  .hero-title-rest::after {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero-title {
+    font-size: clamp(25px, 7vw, 31px);
+  }
+
+  .hero-title-join {
+    margin: 0 .03em;
+  }
+
+  .hero-title-rest {
+    margin-left: .04em;
+  }
+
+  .hero-title-rest::before {
+    margin-right: .12em;
+  }
+}
