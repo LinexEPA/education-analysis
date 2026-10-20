@@ -371,7 +371,13 @@
   }
 
   function buildPersonalSatisfactionSheet(workbook, rows, satColumns) {
-    const headers = ['序', '姓名', '單位', ...satColumns.map((_, i) => `滿${i + 1}`), '感想與建議'];
+    const includeGain = !!window.__formResponseMode;
+    const headers = [
+      '序', '姓名', '單位',
+      ...satColumns.map((_, i) => `滿${i + 1}`),
+      ...(includeGain ? ['具體收穫'] : []),
+      '感想與建議'
+    ];
     const ws = workbook.addWorksheet('個人作答明細(滿意度)', {
       views: [{ state: 'frozen', ySplit: 3, xSplit: 2, showGridLines: false }]
     });
@@ -398,6 +404,7 @@
         cleanPersonName(row['姓名']),
         typeof formatUnitForDetail === 'function' ? formatUnitForDetail(row['單位名稱']) : cleanText(row['單位名稱']),
         ...sats,
+        ...(includeGain ? [cleanText(row['具體收穫'])] : []),
         cleanText(row['感想與建議'])
       ]);
       styleDataRow(dataRow);
@@ -417,6 +424,10 @@
       ws.getColumn(col).width = 6;
       col += 1;
     });
+    if (includeGain) {
+      ws.getColumn(col).width = 28;
+      col += 1;
+    }
     ws.getColumn(col).width = 26;
 
     finishDetailSheet(ws, headers.length);
