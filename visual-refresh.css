@@ -1759,3 +1759,18 @@ h1 {
       "help";
   }
 }
+
+
+/* A14：測驗貼上區加高，方便檢視題目與手動加入空白列 */
+.quiz-textarea {
+  min-height: 410px;
+  height: 410px;
+  resize: vertical;
+}
+
+@media (max-width: 560px) {
+  .quiz-textarea {
+    min-height: 360px;
+    height: 360px;
+  }
+}
