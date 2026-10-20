@@ -331,7 +331,7 @@ function renderQuizDistribution() {
       .sort(([a], [b]) => naturalSort(a, b))
       .map(([rawCode, count]) => {
         const pct = total ? (count / total) * 100 : 0;
-        const option = typeof findOption === 'function' ? findOption(parsed, rawCode) : null;
+        const option = typeof findOptionForResponse === 'function' ? findOptionForResponse(parsed, rawCode) : null;
         const displayCode = option?.code || rawCode;
         const mapped = option?.text || labels[normalizeCode(rawCode)] || '';
         const displayLabel = mapped ? `${displayCode}. ${mapped}` : rawCode;
