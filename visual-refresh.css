@@ -1389,3 +1389,74 @@ h1 {
     white-space: normal;
   }
 }
+
+
+/* A7：第二行採低調小圖示識別，不再用粉綠分字上色 */
+.hero-title-line-two {
+  display: block;
+  margin-top: 10px;
+  white-space: nowrap;
+  font-size: 1em;
+  line-height: 1.15;
+}
+
+.hero-tool-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-tool-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  transform: translateY(1px);
+}
+
+.hero-tool-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-tool-text {
+  position: relative;
+  display: inline-block;
+  color: #579b91;
+  font-size: .64em;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: .055em;
+}
+
+.hero-tool-text::after {
+  content: "✦";
+  display: inline-block;
+  margin-left: .34em;
+  color: #eaa1a3;
+  font-size: .52em;
+  vertical-align: .18em;
+}
+
+/* 舊 A6 分字樣式保留在檔案中但不再套用 */
+.hero-title-tool {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .hero-title-line-two {
+    white-space: normal;
+  }
+
+  .hero-tool-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .hero-tool-text {
+    font-size: .70em;
+  }
+}
