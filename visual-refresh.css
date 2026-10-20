@@ -1621,3 +1621,22 @@ h1 {
     margin: 0 6px;
   }
 }
+
+
+/* A10：使用方式標籤獨立一行，五個步驟下一行橫向排列 */
+.hero-howto {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.hero-howto ol {
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 900px) {
+  .hero-howto ol {
+    flex-wrap: wrap;
+  }
+}
