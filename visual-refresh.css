@@ -2029,3 +2029,121 @@ h1 {
     font-size: 11px;
   }
 }
+
+
+/* A18：單選／複選題設定 */
+.quiz-answer-row {
+  grid-template-columns: 1fr;
+  grid-template-areas: none;
+}
+
+.quiz-answer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.quiz-mode-switch {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  border: 1px solid #dbe8e5;
+  border-radius: 999px;
+  background: #f6faf8;
+}
+
+.quiz-mode-switch button {
+  min-height: 30px;
+  border: 0;
+  border-radius: 999px;
+  padding: 5px 12px;
+  background: transparent;
+  color: #7b8583;
+  font-family: "Huninn", "Noto Sans TC", sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.quiz-mode-switch button.active {
+  background: #fff;
+  color: #3f817b;
+  box-shadow: 0 1px 5px rgba(63,129,123,.12);
+}
+
+.quiz-answer-row > select {
+  width: 100%;
+  margin-top: 1px;
+}
+
+.quiz-multi-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 10px;
+}
+
+.quiz-multi-choice {
+  display: grid;
+  grid-template-columns: 20px 30px 1fr;
+  align-items: start;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid #e1ebe8;
+  border-radius: 11px;
+  background: #fff;
+  color: #4e5c5e;
+  font-size: 12px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.quiz-multi-choice input {
+  width: 17px;
+  height: 17px;
+  margin: 1px 0 0;
+  accent-color: #4f9f97;
+}
+
+.quiz-multi-code {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 22px;
+  border-radius: 999px;
+  background: #edf7f5;
+  color: #477f79;
+  font-weight: 700;
+}
+
+.multi-distribution-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 7px;
+  border: 1px solid #cddbd8;
+  border-radius: 999px;
+  color: #74807e;
+  font-size: 10.5px;
+  font-weight: 600;
+  vertical-align: 1px;
+}
+
+@media (max-width: 700px) {
+  .quiz-answer-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .quiz-multi-options {
+    grid-template-columns: 1fr;
+  }
+
+  .quiz-mode-switch {
+    align-self: stretch;
+  }
+
+  .quiz-mode-switch button {
+    flex: 1;
+  }
+}
