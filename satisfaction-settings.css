@@ -97,3 +97,55 @@
   .sat-settings-grid { grid-template-columns: 1fr; }
   .sat-settings-actions { align-items: stretch; flex-direction: column; }
 }
+
+
+.sat-preset-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid #dbe4ef;
+  border-radius: 10px;
+  background: #f8fbff;
+}
+
+.sat-preset-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  margin-right: 2px;
+}
+
+.sat-preset-btn {
+  appearance: none;
+  border: 1px solid #bfd0e4;
+  border-radius: 9px;
+  background: #fff;
+  color: #35516f;
+  padding: 7px 11px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.sat-preset-btn:hover {
+  border-color: #86a9cf;
+  background: #f3f8fe;
+}
+
+.sat-preset-btn.active {
+  border-color: var(--primary);
+  background: #eef5ff;
+  color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, .08);
+}
+
+@media (max-width: 700px) {
+  .sat-preset-bar { align-items: stretch; }
+  .sat-preset-label { width: 100%; }
+  .sat-preset-btn { flex: 1 1 100%; }
+}
