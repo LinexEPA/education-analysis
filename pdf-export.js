@@ -44,7 +44,10 @@ async function exportCompletePdf() {
 
     // 第二頁籤：個人作答明細。為維持 12pt 以上可讀性，測驗與滿意度拆成兩頁。
     sections.push({ orientation: 'landscape', element: buildAnswerPdfReport(rows, 'quiz') });
-    if (state.satisfactionColumns.length) {
+    const activeSatColumns = typeof window.getActiveSatisfactionColumns === 'function'
+      ? window.getActiveSatisfactionColumns()
+      : state.satisfactionColumns;
+    if (activeSatColumns.length) {
       sections.push({ orientation: 'landscape', element: buildAnswerPdfReport(rows, 'satisfaction') });
     }
 
@@ -220,7 +223,9 @@ function buildSatisfactionPdfReport(rows) {
 function buildAnswerPdfReport(rows, mode) {
   const wrapper = createPdfWrapper(1100);
   const quizColumns = state.quizColumns;
-  const satColumns = state.satisfactionColumns;
+  const satColumns = typeof window.getActiveSatisfactionColumns === 'function'
+    ? window.getActiveSatisfactionColumns()
+    : state.satisfactionColumns;
   const isQuiz = mode === 'quiz';
   const title = isQuiz ? '教育訓練測驗－個人作答明細（測驗作答）' : '教育訓練測驗－個人作答明細（滿意度）';
 
