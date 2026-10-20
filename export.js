@@ -297,9 +297,33 @@ function formatAnswer(parsed, rawValue) {
 function findOption(parsed, rawValue) {
   if (!parsed?.options?.length) return null;
   const raw = cleanText(rawValue);
-  const byCode = parsed.options.find(option => normalizeCode(option.code) === normalizeCode(raw));
+  const rawCode = normalizeCode(raw);
+
+  const byCode = parsed.options.find(option => normalizeCode(option.code) === rawCode);
   if (byCode) return byCode;
-  return parsed.options.find(option => cleanText(option.text).toUpperCase() === raw.toUpperCase()) || null;
+
+  const byText = parsed.options.find(option => cleanText(option.text).toUpperCase() === raw.toUpperCase());
+  if (byText) return byText;
+
+  // 院內系統常把選項儲存成順位 1/2/3/4，即使題目本身使用 A/B/C/D。
+  // 若找不到同名代碼，就用「第幾個選項」對應。
+  if (/^\d+$/.test(rawCode)) {
+    const position = Number(rawCode);
+    if (position >= 1 && position <= parsed.options.length) {
+      return parsed.options[position - 1];
+    }
+  }
+
+  // 反向相容：原始資料是 A/B/C/D，但貼上的題目使用 1/2/3/4。
+  if (/^[A-Z]$/.test(rawCode)) {
+    const position = rawCode.charCodeAt(0) - 64;
+    const numericOptions = parsed.options.every(option => /^\d+$/.test(normalizeCode(option.code)));
+    if (numericOptions && position >= 1 && position <= parsed.options.length) {
+      return parsed.options[position - 1];
+    }
+  }
+
+  return null;
 }
 
 function getCommonUnit(rows) {
