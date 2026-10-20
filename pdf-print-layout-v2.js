@@ -373,7 +373,7 @@ function buildPdfQuestionsV2(rows, chunk, pageIndex, pageCount) {
   const wrapper = createPdfPageV2('landscape');
   const correctAnswers = typeof inferCorrectAnswers === 'function' ? inferCorrectAnswers(rows) : [];
   const code = cleanText(rows[0]?.['課程代碼'] || '').replace(/^'/, '');
-  const rowHeight = chunk.length === 1 ? 540 : 270;
+  const rowHeight = chunk.length === 1 ? 540 : 292;
 
   const body = chunk.map(item => {
     const index = item.index;
@@ -404,8 +404,11 @@ function buildPdfQuestionsV2(rows, chunk, pageIndex, pageCount) {
   wrapper.innerHTML = `
     <style>
       ${basePdfStylesV2()}
-      .p2-question{font-size:16px}
-      .p2-question th,.p2-question td{padding:8px 8px}
+      .p2-sheet h2{font-size:27px!important;margin-bottom:14px!important}
+      .p2-sub{font-size:18px!important;margin-bottom:12px!important}
+      .p2-question{font-size:20px;line-height:1.45}
+      .p2-question th,.p2-question td{padding:9px 8px}
+      .p2-question th{font-size:20px}
       .p2-question th:nth-child(1){width:7%}
       .p2-question th:nth-child(2){width:10%}
       .p2-question th:nth-child(3){width:40%}
