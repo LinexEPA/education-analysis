@@ -92,7 +92,9 @@ buildSatisfactionWorksheet = function(workbook, rows) {
 // 個人作答明細：明確重建，避免下載後還要拉欄寬。
 buildAnswerDetailWorksheet = function(workbook, rows) {
   const quizColumns = state.quizColumns;
-  const satColumns = state.satisfactionColumns;
+  const satColumns = typeof window.getActiveSatisfactionColumns === 'function'
+    ? window.getActiveSatisfactionColumns()
+    : state.satisfactionColumns;
   const headers = [
     '序', '姓名', '單位', '及格', '得分',
     ...quizColumns.map((_, i) => `Q${i + 1}`),
