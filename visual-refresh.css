@@ -1328,3 +1328,64 @@ h1 {
     margin-right: .12em;
   }
 }
+
+
+/* A6：主標題第二行改成較小的粉綠統計感 */
+.hero-title-line-one,
+.hero-title-line-two {
+  display: block;
+}
+
+.hero-title-line-one {
+  white-space: nowrap;
+}
+
+.hero-title-line-two {
+  margin-top: 8px;
+  white-space: nowrap;
+  font-size: .64em;
+  line-height: 1.18;
+  font-weight: 700;
+  letter-spacing: .05em;
+}
+
+.hero-title-tool {
+  position: relative;
+  display: inline-block;
+}
+
+.hero-title-tool.mint {
+  color: #4e978f;
+}
+
+.hero-title-tool.coral {
+  margin-left: .18em;
+  color: #d98288;
+}
+
+.hero-title-tool.mint::before {
+  content: "";
+  display: inline-block;
+  width: .44em;
+  height: .44em;
+  margin-right: .24em;
+  border-radius: 999px;
+  background: #75c4b3;
+  vertical-align: .08em;
+}
+
+.hero-title-tool.coral::after {
+  content: "✦";
+  display: inline-block;
+  margin-left: .34em;
+  color: #efbd71;
+  font-size: .58em;
+  vertical-align: .16em;
+}
+
+@media (max-width: 760px) {
+  .hero-title-line-one,
+  .hero-title-line-two {
+    white-space: normal;
+  }
+}
