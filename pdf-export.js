@@ -214,7 +214,7 @@ function buildSatisfactionPdfReport(rows) {
         <thead><tr><th>序</th><th>項目</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>總計</th><th>平均分數</th><th>滿意度</th></tr></thead>
         <tbody>${itemRows}</tbody>
       </table>
-      <div class="pdf-sign"><div>製表人：</div><div>單位護理長：</div><div>單位督導：</div></div>
+      <div class="pdf-sign"><div>製表人：${escapePdfHtml(meta.preparer || '')}</div><div>單位護理長：</div><div>單位督導：</div></div>
     </div>`;
 
   return wrapper;
