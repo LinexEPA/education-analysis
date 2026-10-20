@@ -463,12 +463,16 @@ function renderQuizPreview() {
             </div>`).join('')}
         </div>
         <div class="quiz-answer-row">
-          <label for="quizAnswer${index}">正確答案 <span class="optional">選填</span></label>
+          <div class="quiz-answer-label">
+            <span class="quiz-answer-badge">✓</span>
+            <label for="quizAnswer${index}">請選擇正確答案</label>
+            <span class="optional">選填</span>
+          </div>
           <select id="quizAnswer${index}" data-quiz-answer-index="${index}">
-            <option value="">留白，之後再補</option>
+            <option value="">尚未設定｜留白後可再補</option>
             ${answerOptions}
           </select>
-          <span>不選時 Excel／PDF 會留白；Excel 匯出後也可以再自行填寫。</span>
+          <span class="quiz-answer-help">這裡只接受你明確指定的答案；系統不會從學員分數反推。</span>
         </div>
         ${warningText}
       </article>`;
