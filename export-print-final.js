@@ -111,23 +111,28 @@
       margins: { left: 0.28, right: 0.28, top: 0.3, bottom: 0.45, header: 0.12, footer: 0.22 }
     };
 
+    // 移除「分布判讀」欄，把空間留給題目與選項內容。
     ws.columns = [
-      { width: 8 }, { width: 48 }, { width: 11 },
-      { width: 38 }, { width: 9 }, { width: 10 }, { width: 14 }
+      { width: 8 },
+      { width: 51 },
+      { width: 11 },
+      { width: 49 },
+      { width: 10 },
+      { width: 11 }
     ];
 
-    ws.mergeCells('A1:G1');
+    ws.mergeCells('A1:F1');
     ws.getCell('A1').value = '教育訓練測驗作答分布';
     styleTitle(ws.getCell('A1'), 19);
     ws.getRow(1).height = 36;
 
-    ws.mergeCells('A2:G2');
+    ws.mergeCells('A2:F2');
     ws.getCell('A2').value = `課程代碼：${courseCode(rows)}　｜　呈現各選項實際作答人數與比例`;
     ws.getCell('A2').font = { name: 'DFKai-SB', size: 13, color: { argb: BLACK } };
     ws.getCell('A2').alignment = { horizontal: 'left', vertical: 'middle', indent: 1 };
     ws.getRow(2).height = 28;
 
-    const header = ws.addRow(['題號', '題目', '作答選項', '選項內容', '人數', '比例', '分布判讀']);
+    const header = ws.addRow(['題號', '題目', '作答選項', '選項內容', '人數', '比例']);
     styleHeaderRow(header);
 
     state.quizColumns.forEach((column, index) => {
@@ -154,66 +159,78 @@
       const entries = Object.values(distribution).sort((a, b) => naturalSort(a.code, b.code));
       const total = entries.reduce((sum, item) => sum + item.count, 0);
 
-      if (!entries.length) {
-        entries.push({ code: '', text: '', count: 0 });
-      }
+      if (!entries.length) entries.push({ code: '', text: '', count: 0 });
 
       const counts = entries.map(item => item.count);
       const maxCount = Math.max(...counts);
       const minCount = Math.min(...counts);
+      const startRow = ws.rowCount + 1;
 
       entries.forEach((item, answerIndex) => {
-        let distributionLabel = '';
-        if (entries.length === 1) {
-          distributionLabel = '唯一作答';
-        } else if (item.count === maxCount && item.count === minCount) {
-          distributionLabel = '最高＝最低';
-        } else if (item.count === maxCount) {
-          distributionLabel = '↑ 最高作答';
-        } else if (item.count === minCount) {
-          distributionLabel = '↓ 最低作答';
-        }
-
         const row = ws.addRow([
           answerIndex === 0 ? `Q${index + 1}` : '',
           answerIndex === 0 ? questionText : '',
           item.code,
           item.text,
           item.count,
-          total ? item.count / total : 0,
-          distributionLabel
+          total ? item.count / total : 0
         ]);
+
         styleDataRow(row);
         row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
-        row.getCell(2).alignment = { horizontal: 'left', vertical: 'top', wrapText: true };
+        row.getCell(2).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
         row.getCell(3).alignment = { horizontal: 'center', vertical: 'middle' };
         row.getCell(4).alignment = { horizontal: 'left', vertical: 'top', wrapText: true };
         row.getCell(5).alignment = { horizontal: 'center', vertical: 'middle' };
         row.getCell(6).alignment = { horizontal: 'center', vertical: 'middle' };
         row.getCell(6).numFmt = '0.0%';
-        row.getCell(7).alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
 
-        if (distributionLabel.includes('最高')) {
-          [5, 6, 7].forEach(col => {
-            row.getCell(col).font = { ...(row.getCell(col).font || {}), bold: true, color: { argb: BLACK } };
-            row.getCell(col).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: LIGHTER_GRAY } };
+        // 不反灰、不增加文字判讀；只用字型區分最高與最低，保留黑白列印清楚度。
+        if (entries.length > 1 && item.count === maxCount) {
+          [5, 6].forEach(col => {
+            row.getCell(col).font = {
+              ...(row.getCell(col).font || {}),
+              bold: true,
+              color: { argb: BLACK }
+            };
           });
         }
-        if (distributionLabel.includes('最低')) {
-          row.getCell(7).font = { ...(row.getCell(7).font || {}), bold: true, color: { argb: BLACK } };
-          row.getCell(7).border = {
-            ...(row.getCell(7).border || {}),
-            bottom: { style: 'double', color: { argb: BORDER } }
-          };
+        if (entries.length > 1 && item.count === minCount && minCount !== maxCount) {
+          [5, 6].forEach(col => {
+            row.getCell(col).font = {
+              ...(row.getCell(col).font || {}),
+              underline: true,
+              color: { argb: BLACK }
+            };
+          });
         }
 
-        const qLines = answerIndex === 0 ? estimateLinesFinal(questionText, 31) : 1;
-        const oLines = estimateLinesFinal(item.text, 30);
-        row.height = Math.max(34, Math.min(140, Math.max(qLines, oLines) * 20 + 12));
+        const oLines = estimateLinesFinal(item.text, 37);
+        row.height = Math.max(34, Math.min(120, oLines * 20 + 12));
       });
+
+      const endRow = ws.rowCount;
+
+      // 每一題的題號、題目跨所有作答選項合併，讓題目結構一眼看懂。
+      if (endRow > startRow) {
+        ws.mergeCells(startRow, 1, endRow, 1);
+        ws.mergeCells(startRow, 2, endRow, 2);
+      }
+
+      ws.getCell(startRow, 1).alignment = { horizontal: 'center', vertical: 'middle' };
+      ws.getCell(startRow, 2).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+
+      // 題與題之間用較粗的底線區隔。
+      for (let col = 1; col <= 6; col += 1) {
+        const cell = ws.getCell(endRow, col);
+        cell.border = {
+          ...(cell.border || {}),
+          bottom: { style: 'medium', color: { argb: BORDER } }
+        };
+      }
     });
 
-    ws.pageSetup.printArea = `A1:G${ws.rowCount}`;
+    ws.pageSetup.printArea = `A1:F${ws.rowCount}`;
     ws.pageSetup.printTitlesRow = '1:3';
     ws.headerFooter = {
       oddFooter: '&C第 &P 頁 / 共 &N 頁',
