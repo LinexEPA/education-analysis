@@ -147,7 +147,7 @@
       rows.forEach(row => {
         const raw = cleanText(row[column]);
         if (!raw) return;
-        const option = typeof findOption === 'function' ? findOption(parsed, raw) : null;
+        const option = typeof findOptionForResponse === 'function' ? findOptionForResponse(parsed, raw) : (typeof findOption === 'function' ? findOption(parsed, raw) : null);
         const code = cleanText(option?.code || raw);
         const key = normalizeCode(code) || code;
         if (!distribution[key]) {
