@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="style.css?v=20261020-6" />
   <link rel="stylesheet" href="satisfaction-settings.css?v=20261020-6" />
   <link rel="stylesheet" href="report-meta.css?v=20261020-6" />
-  <link rel="stylesheet" href="visual-refresh.css?v=20261020-A3" />
+  <link rel="stylesheet" href="visual-refresh.css?v=20261020-A4" />
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -20,19 +20,43 @@
 <body>
   <main class="page-shell">
     <header class="hero">
-      <div>
+      <div class="hero-copy-block">
         <p class="eyebrow">教育訓練資料整理</p>
         <h1>教育訓練測驗與滿意度統計轉檔工具</h1>
-        <p class="hero-copy">上傳院內下載的 ODS / XLSX，快速辨識測驗與滿意度資料，再依需要補上題目與選項。</p>
+        <p class="hero-copy">上傳 ODS / XLSX，快速辨識測驗與滿意度資料，再依需要補上題目與選項。</p>
+        <div class="privacy-note"><span>♡</span> 原始檔僅在瀏覽器端解析</div>
       </div>
-      <div class="privacy-pill">原始檔僅在瀏覽器端解析</div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hero-visual-wash"></div>
+        <div class="hero-sheet">
+          <div class="hero-sheet-head">
+            <span class="hero-sheet-icon">▤</span>
+            <span>教育訓練資料</span>
+          </div>
+          <div class="hero-sheet-row">
+            <span class="hero-dot mint"></span><i></i><b></b>
+          </div>
+          <div class="hero-sheet-row">
+            <span class="hero-dot coral"></span><i></i><b></b>
+          </div>
+          <div class="hero-sheet-row">
+            <span class="hero-dot gold"></span><i></i><b></b>
+          </div>
+          <div class="hero-sheet-chart">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <span class="hero-spark one">✦</span>
+        <span class="hero-spark two">✿</span>
+      </div>
     </header>
 
     <section class="step-card" id="uploadStep">
       <div class="step-heading">
         <span class="step-number">1</span>
         <div>
-          <h2>上傳院內資料</h2>
+          <h2>上傳資料</h2>
           <p>支援 .ods、.xlsx、.xls。分析畫面不顯示個人姓名；正式 Excel 可保留姓名與作答明細，身分證字號不輸出。</p>
         </div>
       </div>
@@ -41,7 +65,7 @@
         <input id="fileInput" type="file" accept=".ods,.xlsx,.xls" hidden />
         <div class="drop-icon">⇧</div>
         <strong>拖曳檔案到這裡，或點一下選擇檔案</strong>
-        <span>院內教育訓練匯出檔</span>
+        <span>教育訓練匯出檔</span>
       </label>
 
       <div id="fileStatus" class="status-line muted">尚未選擇檔案</div>
