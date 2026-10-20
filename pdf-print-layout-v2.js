@@ -292,10 +292,10 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
       else if (count === maxCount) flag = '最高作答';
       else if (count === minCount) flag = '最低作答';
 
-      const displayLabel = label ? `${codeValue}. ${label}` : codeValue;
       return `
         <div class="p2-bar-row">
-          <div class="p2-bar-label">${escapePdfV2(displayLabel)}</div>
+          <div class="p2-bar-code p2-num">${escapePdfV2(codeValue)}.</div>
+          <div class="p2-bar-label">${escapePdfV2(label)}</div>
           <div class="p2-bar-track"><div class="p2-bar-fill" style="width:${pct.toFixed(1)}%"></div></div>
           <div class="p2-bar-value p2-num">${count}人 · ${pct.toFixed(1)}%</div>
           <div class="p2-bar-flag">${flag ? escapePdfV2(flag) : ''}</div>
@@ -323,13 +323,15 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
       .p2-bar-list{display:grid;gap:8px}
       .p2-bar-row{
         display:grid;
-        grid-template-columns:minmax(300px, 1.65fr) minmax(200px, 1.05fr) 112px 76px;
+        grid-template-columns:28px minmax(270px, 1.55fr) minmax(200px, 1.05fr) 112px 76px;
         align-items:center;
-        gap:8px;
+        column-gap:8px;
+        row-gap:4px;
         min-height:28px;
         font-size:17px;
       }
-      .p2-bar-label{line-height:1.35;color:#111}
+      .p2-bar-code{align-self:start;padding-top:1px;text-align:right;color:#111;line-height:1.35}
+      .p2-bar-label{align-self:start;line-height:1.35;color:#111;text-align:left}
       .p2-bar-track{height:11px;max-width:340px;border-radius:999px;background:#e7ecea;overflow:hidden}
       .p2-bar-fill{height:100%;border-radius:999px;background:#5ca99f}
       .p2-bar-value{text-align:right;color:#222;white-space:nowrap;font-weight:700;font-size:16px}
