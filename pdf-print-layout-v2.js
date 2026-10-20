@@ -502,8 +502,8 @@ function buildPdfQuestionsV2(rows, chunk, pageIndex, pageCount) {
       .p2-question th{font-size:16px;background:#e7e7e7!important;color:#111!important}
       .p2-question th:nth-child(1){width:7%}
       .p2-question th:nth-child(2){width:10%}
-      .p2-question th:nth-child(3){width:40%}
-      .p2-question th:nth-child(4){width:43%}
+      .p2-question th:nth-child(3){width:27%}
+      .p2-question th:nth-child(4){width:56%}
     </style>
     <div class="p2-sheet">
       <h2>教育訓練測驗題目</h2>
