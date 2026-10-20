@@ -4,6 +4,7 @@
 const REPORT_META_KEY = 'education-analysis-report-meta-v1';
 
 window.getReportMeta = function(rows = (window.state?.rows || [])) {
+  const preparer = cleanMetaText(document.getElementById('metaPreparer')?.value || '');
   const lecturer = cleanMetaText(document.getElementById('metaLecturer')?.value || '');
   const participantRaw = cleanMetaText(document.getElementById('metaParticipants')?.value || '');
   const dateRaw = cleanMetaText(document.getElementById('metaDate')?.value || '');
@@ -16,6 +17,7 @@ window.getReportMeta = function(rows = (window.state?.rows || [])) {
   }
 
   return {
+    preparer,
     lecturer,
     participantCount: Number.isFinite(participantNumber) ? participantNumber : '',
     date: dateRaw,
@@ -42,6 +44,10 @@ window.getReportMeta = function(rows = (window.state?.rows || [])) {
     </div>
     <div class="report-meta-grid">
       <label>
+        <span>製表人</span>
+        <input id="metaPreparer" type="text" placeholder="例如：王○○" />
+      </label>
+      <label>
         <span>講師</span>
         <input id="metaLecturer" type="text" placeholder="例如：王○○" />
       </label>
@@ -64,12 +70,13 @@ window.getReportMeta = function(rows = (window.state?.rows || [])) {
   const exportBtn = document.getElementById('exportBtn');
   outputStep.insertBefore(box, exportBtn);
 
+  document.getElementById('metaPreparer').value = saved.preparer || '';
   document.getElementById('metaLecturer').value = saved.lecturer || '';
   document.getElementById('metaParticipants').value = saved.participantCount ?? '';
   document.getElementById('metaDate').value = saved.date || '';
   document.getElementById('metaResponseRate').value = saved.responseRate ?? '';
 
-  ['metaLecturer', 'metaParticipants', 'metaDate', 'metaResponseRate'].forEach(id => {
+  ['metaPreparer', 'metaLecturer', 'metaParticipants', 'metaDate', 'metaResponseRate'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', saveMeta);
     document.getElementById(id)?.addEventListener('change', saveMeta);
   });
@@ -83,6 +90,7 @@ window.getReportMeta = function(rows = (window.state?.rows || [])) {
 function saveMeta() {
   try {
     const payload = {
+      preparer: document.getElementById('metaPreparer')?.value || '',
       lecturer: document.getElementById('metaLecturer')?.value || '',
       participantCount: document.getElementById('metaParticipants')?.value || '',
       date: document.getElementById('metaDate')?.value || '',
