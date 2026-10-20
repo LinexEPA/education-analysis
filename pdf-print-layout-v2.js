@@ -269,34 +269,45 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
     const question = parsed?.question || item.column;
     const labels = Object.fromEntries((parsed?.options || []).map(opt => [normalizeCode(opt.code), cleanText(opt.text)]));
     const counts = {};
+
     rows.forEach(row => {
       const raw = cleanText(row[item.column]);
       if (!raw) return;
       counts[raw] = (counts[raw] || 0) + 1;
     });
-    const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
 
-    const rowsHtml = Object.entries(counts)
-      .sort(([a], [b]) => naturalSort(a, b))
-      .map(([codeValue, count]) => {
-        const label = labels[normalizeCode(codeValue)] || '';
-        const pct = total ? (count / total) * 100 : 0;
-        return `
-          <tr>
-            <td class="p2-center p2-num">${escapePdfV2(codeValue)}</td>
-            <td class="p2-left">${escapePdfV2(label)}</td>
-            <td class="p2-center p2-num">${count}</td>
-            <td class="p2-center p2-num">${pct.toFixed(1)}%</td>
-          </tr>`;
-      }).join('');
+    const entries = Object.entries(counts)
+      .sort(([a], [b]) => naturalSort(a, b));
+    const total = entries.reduce((sum, [, count]) => sum + count, 0);
+    const values = entries.map(([, count]) => count);
+    const maxCount = values.length ? Math.max(...values) : 0;
+    const minCount = values.length ? Math.min(...values) : 0;
+
+    const bars = entries.map(([codeValue, count]) => {
+      const label = labels[normalizeCode(codeValue)] || '';
+      const pct = total ? (count / total) * 100 : 0;
+      let flag = '';
+      if (entries.length === 1) flag = '唯一作答';
+      else if (count === maxCount && count === minCount) flag = '最高＝最低';
+      else if (count === maxCount) flag = '最高作答';
+      else if (count === minCount) flag = '最低作答';
+
+      const displayLabel = label ? `${codeValue}. ${label}` : codeValue;
+      return `
+        <div class="p2-bar-row">
+          <div class="p2-bar-label">${escapePdfV2(displayLabel)}</div>
+          <div class="p2-bar-track"><div class="p2-bar-fill" style="width:${pct.toFixed(1)}%"></div></div>
+          <div class="p2-bar-value p2-num">${count}人 · ${pct.toFixed(1)}%</div>
+          <div class="p2-bar-flag">${flag ? escapePdfV2(flag) : ''}</div>
+        </div>`;
+    }).join('');
 
     return `
       <section class="p2-dist-block">
         <h3>${item.index + 1}. ${escapePdfV2(question)}</h3>
-        <table class="p2-table p2-dist-table">
-          <thead><tr><th>作答選項</th><th>選項內容</th><th>人數</th><th>比例</th></tr></thead>
-          <tbody>${rowsHtml || '<tr><td colspan="4" class="p2-center">沒有有效作答資料</td></tr>'}</tbody>
-        </table>
+        <div class="p2-bar-list">
+          ${bars || '<div class="p2-empty">沒有有效作答資料</div>'}
+        </div>
       </section>`;
   }).join('');
 
@@ -304,17 +315,37 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
     <style>
       ${basePdfStylesV2()}
       .p2-sheet h2{font-size:30px!important;color:#111!important;margin-bottom:12px!important}
-      .p2-sub{font-size:20px!important;color:#111!important;margin-bottom:14px!important}
-      .p2-dist-grid{display:grid;grid-template-columns:1fr;gap:18px}
-      .p2-dist-block{break-inside:avoid}
-      .p2-dist-block h3{margin:0 0 8px;font-size:21px;line-height:1.42;color:#111}
-      .p2-dist-table{font-size:18px}
-      .p2-dist-table th,.p2-dist-table td{padding:7px 8px}
-      .p2-dist-table th{background:#e7e7e7!important;color:#111!important}
-      .p2-dist-table th:nth-child(1){width:15%}
-      .p2-dist-table th:nth-child(2){width:55%}
-      .p2-dist-table th:nth-child(3){width:15%}
-      .p2-dist-table th:nth-child(4){width:15%}
+      .p2-sub{font-size:20px!important;color:#111!important;margin-bottom:16px!important}
+      .p2-dist-grid{display:grid;grid-template-columns:1fr;gap:20px}
+      .p2-dist-block{break-inside:avoid;padding:0 0 17px;border-bottom:1px dashed #c9cecc}
+      .p2-dist-block:last-child{border-bottom:0}
+      .p2-dist-block h3{margin:0 0 10px;font-size:22px;line-height:1.42;color:#111}
+      .p2-bar-list{display:grid;gap:8px}
+      .p2-bar-row{
+        display:grid;
+        grid-template-columns:minmax(230px, 1.35fr) minmax(300px, 2fr) 128px 88px;
+        align-items:center;
+        gap:10px;
+        min-height:30px;
+        font-size:17px;
+      }
+      .p2-bar-label{line-height:1.35;color:#111}
+      .p2-bar-track{height:13px;border-radius:999px;background:#e7ecea;overflow:hidden}
+      .p2-bar-fill{height:100%;border-radius:999px;background:#5ca99f}
+      .p2-bar-value{text-align:right;color:#222;white-space:nowrap;font-weight:700}
+      .p2-bar-flag{
+        min-height:24px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:999px;
+        font-size:13px;
+        font-weight:700;
+        color:#333;
+        background:#f0f1ef;
+      }
+      .p2-bar-flag:empty{background:transparent}
+      .p2-empty{font-size:17px;color:#666}
     </style>
     <div class="p2-sheet">
       <h2>教育訓練測驗作答分布</h2>
