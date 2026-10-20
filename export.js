@@ -23,8 +23,8 @@ exportBtn.addEventListener('click', async () => {
     if (state.quizColumns.length && typeof buildQuizDistributionWorksheet === 'function') {
       buildQuizDistributionWorksheet(workbook, rows);
     }
-    buildAnswerDetailWorksheet(workbook, rows);
     buildQuestionSummaryWorksheet(workbook, rows);
+    buildAnswerDetailWorksheet(workbook, rows);
 
     const comments = rows
       .map(row => cleanText(row['感想與建議']))
