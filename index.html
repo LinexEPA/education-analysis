@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="教育訓練滿意度與測驗統計轉檔工具" />
   <title>教育訓練測驗與滿意度統計轉檔工具</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20261020-5" />
   <link rel="stylesheet" href="satisfaction-settings.css?v=20261020-2" />
   <link rel="stylesheet" href="report-meta.css" />
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -65,11 +65,11 @@
         id="quizText"
         class="quiz-textarea"
         spellcheck="false"
-        placeholder="可直接貼：1.題目 1.選項一 2.選項二 3.選項三 4.選項四&#10;也支援：(1)選項、[A]選項、O/X。&#10;若有官方答案，可另寫「答案：3」；沒有就留白，不會從學員成績推測。"
+        placeholder="可直接貼：1.題目 1.選項一 2.選項二 3.選項三 4.選項四&#10;也支援：(1)選項、[A]選項、O/X。&#10;解析後可直接在每一題下方選擇正確答案；不選就留白，不會從學員成績推測。"
       ></textarea>
 
       <div class="helper-row">
-        <span>可使用 1.題目＋1.2.3.4 選項，不必每個選項換行；也相容 (1)、[A]、O/X。若有官方答案可寫「答案：3」，未提供就留白。</span>
+        <span>可使用 1.題目＋1.2.3.4 選項，不必每個選項換行；也相容 (1)、[A]、O/X。解析後可直接選擇正確答案，或留白後在 Excel 再補。</span>
         <button id="parseQuizBtn" class="secondary-btn" type="button">解析題目</button>
       </div>
 
