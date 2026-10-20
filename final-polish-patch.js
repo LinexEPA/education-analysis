@@ -46,14 +46,14 @@
 
         const qText = getExcelCellText(qCell);
         const oText = getExcelCellText(oCell);
-        const qLines = estimateExcelWrappedLines(qText, 31);
+        const qLines = estimateExcelWrappedLines(qText, 27);
         const oLines = oText
-          ? oText.split('\n').reduce((sum, line) => sum + estimateExcelWrappedLines(line, 36), 0)
+          ? oText.split('\n').reduce((sum, line) => sum + estimateExcelWrappedLines(line, 32), 0)
           : 1;
         const lines = Math.max(qLines, oLines, 2);
 
-        // ExcelJS 不會真的 AutoFit 列高，所以依內容估算；12pt 時保留較寬鬆行距。
-        row.height = Math.max(42, Math.min(320, lines * 19 + 14));
+        // 題目統計頁改為約 14pt，列高同步加大，避免題幹／選項被截斷。
+        row.height = Math.max(50, Math.min(360, lines * 23 + 16));
       }
 
       ws.pageSetup.fitToWidth = 1;
