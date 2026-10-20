@@ -51,6 +51,15 @@
     window.__satSettingMode = currentMode;
   }
 
+  window.getActiveSatisfactionColumns = function() {
+    const columns = (typeof state !== 'undefined' && Array.isArray(state.satisfactionColumns))
+      ? state.satisfactionColumns
+      : [];
+    if (window.__formResponseMode) return [...columns];
+    const count = Math.max(1, Number(window.__satActiveCount) || SAT_LABELS.length || columns.length);
+    return columns.slice(0, count);
+  };
+
   function refreshAnalysisIfNeeded() {
     if (typeof state !== 'undefined' && state.rows?.length && typeof renderAnalysis === 'function') {
       renderAnalysis();
@@ -188,12 +197,24 @@
     const input = event.target.closest('input[data-sat-index]');
     if (!input) return;
 
-    switchEditedPresetToCustom();
-
     const index = Number(input.dataset.satIndex);
-    SAT_LABELS[index] = input.value;
-    window.__satActiveCount = SAT_LABELS.length;
-    hint.textContent = `目前：自訂 ${SAT_LABELS.length} 題`;
+    const value = input.value;
+
+    if (isPresetMode()) {
+      currentMode = 'custom';
+      SAT_LABELS[index] = value;
+      window.__satSettingMode = currentMode;
+      window.__satActiveCount = SAT_LABELS.length;
+      renderInputs();
+      const nextInput = inputsWrap.querySelector(`input[data-sat-index="${index}"]`);
+      nextInput?.focus();
+      if (nextInput) nextInput.setSelectionRange(nextInput.value.length, nextInput.value.length);
+    } else {
+      SAT_LABELS[index] = value;
+      window.__satActiveCount = SAT_LABELS.length;
+      hint.textContent = `目前：自訂 ${SAT_LABELS.length} 題`;
+    }
+
     announce('✓ 已更新自訂滿意度題目。');
     refreshAnalysisIfNeeded();
   });
@@ -221,8 +242,8 @@
     renderInputs();
     announce(`✓ 已增加一題，目前自訂 ${SAT_LABELS.length} 題。`);
     refreshAnalysisIfNeeded();
-    const lastInput = inputsWrap.querySelector('input[data-sat-index]:last-of-type');
-    lastInput?.focus();
+    const allInputs = inputsWrap.querySelectorAll('input[data-sat-index]');
+    allInputs[allInputs.length - 1]?.focus();
   });
 
   specialtyBtn.addEventListener('click', () => usePreset('specialty'));
@@ -309,5 +330,13 @@
       promptShown = true;
       openReminder();
     }, 0);
+  });
+
+  document.getElementById('resetBtn')?.addEventListener('click', () => {
+    promptShown = false;
+    currentMode = 'specialty';
+    applyLabels([...SPECIALTY_LABELS]);
+    renderInputs();
+    announce('已恢復預設：專科在職教育 10 題。', 'muted');
   });
 })();
