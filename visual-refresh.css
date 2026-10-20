@@ -1654,3 +1654,29 @@ h1 {
     margin-right: 4px;
   }
 }
+
+
+/* A12：明顯收緊步驟之間距，箭頭更小、更靠近文字 */
+.hero-howto li {
+  gap: 4px;
+}
+
+.hero-howto li + li::before {
+  content: "→";
+  margin-left: 2px;
+  margin-right: 2px;
+  font-size: 10px;
+  color: #a8b0ae;
+}
+
+@media (max-width: 560px) {
+  .hero-howto li {
+    gap: 3px;
+  }
+
+  .hero-howto li + li::before {
+    margin-left: 1px;
+    margin-right: 1px;
+    font-size: 9px;
+  }
+}
