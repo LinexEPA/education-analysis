@@ -221,19 +221,19 @@
 
     ws.mergeCells('A1:D1');
     ws.getCell('A1').value = '教育訓練測驗題目';
-    styleTitle(ws.getCell('A1'), 20);
+    styleTitle(ws.getCell('A1'), 18);
     ws.getRow(1).height = 40;
 
     ws.mergeCells('A2:D2');
     ws.getCell('A2').value = `課程代碼：${courseCode(rows)}　｜　題目統計 ${state.quizColumns.length}/${state.quizColumns.length}`;
-    ws.getCell('A2').font = { name: 'DFKai-SB', size: 15, color: { argb: BLACK } };
+    ws.getCell('A2').font = { name: 'DFKai-SB', size: 12, color: { argb: BLACK } };
     ws.getCell('A2').alignment = { horizontal: 'left', vertical: 'middle', indent: 1 };
     ws.getRow(2).height = 30;
 
     const header = ws.addRow(['題號', '正確答案', '題目', '選項']);
     styleHeaderRow(header);
     header.eachCell(cell => {
-      cell.font = { ...(cell.font || {}), size: 15, color: { argb: BLACK } };
+      cell.font = { ...(cell.font || {}), size: 12, color: { argb: BLACK } };
     });
     header.height = 36;
 
@@ -268,7 +268,7 @@
       row.eachCell({ includeEmpty: true }, cell => {
         cell.font = {
           ...(cell.font || {}),
-          size: 16,
+          size: 12,
           color: { argb: BLACK }
         };
         setPrintBorder(cell);
@@ -281,15 +281,15 @@
 
       if (correct) {
         row.getCell(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: LIGHTER_GRAY } };
-        row.getCell(2).font = { name: 'Times New Roman', size: 16, bold: true, color: { argb: BLACK } };
+        row.getCell(2).font = { name: 'Times New Roman', size: 12, bold: true, color: { argb: BLACK } };
       }
 
-      const qLines = estimateLinesFinal(questionText, 25);
+      const qLines = estimateLinesFinal(questionText, 31);
       const oLines = optionText
-        ? optionText.split('\n').reduce((sum, line) => sum + estimateLinesFinal(line, 30), 0)
+        ? optionText.split('\n').reduce((sum, line) => sum + estimateLinesFinal(line, 36), 0)
         : 1;
       const lines = Math.max(qLines, oLines, 2);
-      row.height = Math.max(60, Math.min(380, lines * 27 + 18));
+      row.height = Math.max(46, Math.min(300, lines * 20 + 14));
     });
 
     ws.pageSetup.printArea = `A1:D${ws.rowCount}`;
@@ -301,7 +301,7 @@
     };
 
     if (typeof applyBilingualFontsToWorksheet === 'function') applyBilingualFontsToWorksheet(ws);
-    applyPrintFonts(ws, 16);
+    applyPrintFonts(ws, 12);
   };
 
   // ---------- 4 / 5. 個人作答明細拆頁 ----------
