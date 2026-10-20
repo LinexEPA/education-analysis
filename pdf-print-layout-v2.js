@@ -462,27 +462,62 @@ function makeQuestionChunksV2(rows) {
   return chunks;
 }
 
+function pdfQuizPaperUsesAlphabeticCodesV2() {
+  const questions = (state.parsedQuiz || []).filter(question => question?.options?.length);
+  if (!questions.length) return false;
+
+  return questions.every(question =>
+    question.options.every((option, index) =>
+      normalizeCode(option.code) === String.fromCharCode(65 + index)
+    )
+  );
+}
+
+function pdfQuizPaperDisplayCorrectV2(parsed, rawCorrect, useAlphabetic) {
+  const raw = normalizeCode(rawCorrect);
+  if (!raw) return '';
+
+  let index = parsed?.options?.findIndex(option => normalizeCode(option.code) === raw) ?? -1;
+
+  if (index < 0 && /^\d+$/.test(raw)) {
+    const position = Number(raw) - 1;
+    if (position >= 0 && position < (parsed?.options?.length || 0)) index = position;
+  }
+
+  if (index < 0 && /^[A-Z]$/.test(raw)) {
+    const position = raw.charCodeAt(0) - 65;
+    if (position >= 0 && position < (parsed?.options?.length || 0)) index = position;
+  }
+
+  if (index < 0) return rawCorrect || '';
+  return useAlphabetic ? String.fromCharCode(65 + index) : String(index + 1);
+}
+
 function buildPdfQuestionsV2(rows, chunk, pageIndex, pageCount) {
   const wrapper = createPdfPageV2('landscape');
   const correctAnswers = typeof inferCorrectAnswers === 'function' ? inferCorrectAnswers(rows) : [];
   const code = cleanText(rows[0]?.['課程代碼'] || '').replace(/^'/, '');
   const rowHeight = chunk.length === 1 ? 420 : 220;
+  const useAlphabeticCodes = pdfQuizPaperUsesAlphabeticCodesV2();
 
   const body = chunk.map(item => {
     const index = item.index;
     const column = item.column;
     const parsed = state.parsedQuiz[index];
     const question = parsed?.question || column;
-    const correct = correctAnswers[index] || '';
+    const correct = pdfQuizPaperDisplayCorrectV2(parsed, correctAnswers[index] || '', useAlphabeticCodes);
     const answered = rows.map(row => cleanText(row[column])).filter(Boolean);
     let options = parsed?.options?.length
       ? parsed.options.map(option => ({ code: cleanText(option.code), text: cleanText(option.text) }))
       : [...new Set(answered)].map(value => ({ code: value, text: '' }));
     if (!options.length) options = [{ code: '', text: '' }];
 
-    const optionHtml = options.map(option => {
+    const optionHtml = options.map((option, optionIndex) => {
+      const displayCode = useAlphabeticCodes
+        ? String.fromCharCode(65 + optionIndex)
+        : String(optionIndex + 1);
       const text = option.text ? ` ${escapePdfV2(option.text)}` : '';
-      return `(${escapePdfV2(option.code)})${text}`;
+      return `(${escapePdfV2(displayCode)})${text}`;
     }).join('<br>');
 
     return `
