@@ -28,12 +28,12 @@
     };
   }
 
-  function raiseWorksheetFonts(ws, headerRows = []) {
+  function raiseWorksheetFonts(ws, headerRows = [], bodySize = MIN_BODY_SIZE, headerSize = MIN_HEADER_SIZE) {
     if (!ws) return;
     const headerSet = new Set(headerRows);
 
     ws.eachRow({ includeEmpty: false }, row => {
-      const minSize = headerSet.has(row.number) ? MIN_HEADER_SIZE : MIN_BODY_SIZE;
+      const minSize = headerSet.has(row.number) ? headerSize : bodySize;
       row.eachCell({ includeEmpty: false }, cell => raiseCellFontSize(cell, minSize));
 
       // 12pt 後避免固定列高造成文字被切掉。
@@ -72,8 +72,14 @@
     buildQuestionSummaryWorksheet = function(workbook, rows) {
       base(workbook, rows);
       const ws = workbook.getWorksheet('測驗題目統計');
-      raiseWorksheetFonts(ws, [3]);
-      if (ws) ws.getRow(3).height = Math.max(Number(ws.getRow(3).height) || 0, 30);
+      raiseWorksheetFonts(ws, [3], 14, 14);
+      if (ws) {
+        raiseCellFontSize(ws.getCell('A1'), 18);
+        raiseCellFontSize(ws.getCell('A2'), 14);
+        ws.getRow(1).height = Math.max(Number(ws.getRow(1).height) || 0, 34);
+        ws.getRow(2).height = Math.max(Number(ws.getRow(2).height) || 0, 28);
+        ws.getRow(3).height = Math.max(Number(ws.getRow(3).height) || 0, 34);
+      }
     };
   }
 
