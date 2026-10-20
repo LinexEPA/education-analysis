@@ -48,8 +48,11 @@ async function exportCompletePdfV2() {
     });
 
     // 3. 個人滿意度明細：10 題全部放在同一頁寬度內；人數過多時只做縱向分頁，不拆題目。
-    if (state.satisfactionColumns.length) {
-      const satGroup = state.satisfactionColumns.map((column, index) => ({ column, index }));
+    const activeSatColumns = typeof window.getActiveSatisfactionColumns === 'function'
+      ? window.getActiveSatisfactionColumns()
+      : state.satisfactionColumns;
+    if (activeSatColumns.length) {
+      const satGroup = activeSatColumns.map((column, index) => ({ column, index }));
       rowChunks.forEach((chunk, pageIndex) => {
         sections.push({
           orientation: 'portrait',
