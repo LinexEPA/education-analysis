@@ -20,6 +20,9 @@ exportBtn.addEventListener('click', async () => {
     workbook.created = new Date();
 
     buildSatisfactionWorksheet(workbook, rows);
+    if (state.quizColumns.length && typeof buildQuizDistributionWorksheet === 'function') {
+      buildQuizDistributionWorksheet(workbook, rows);
+    }
     buildAnswerDetailWorksheet(workbook, rows);
     buildQuestionSummaryWorksheet(workbook, rows);
 
