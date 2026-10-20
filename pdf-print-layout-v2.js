@@ -316,7 +316,7 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
       ${basePdfStylesV2()}
       .p2-sheet h2{font-size:30px!important;color:#111!important;margin-bottom:12px!important}
       .p2-sub{font-size:20px!important;color:#111!important;margin-bottom:16px!important}
-      .p2-dist-grid{display:grid;grid-template-columns:1fr;gap:20px}
+      .p2-dist-grid{display:grid;grid-template-columns:1fr;gap:20px;transform:scale(.8);transform-origin:top left;width:125%}
       .p2-dist-block{break-inside:avoid;padding:0 0 17px;border-bottom:1px dashed #c9cecc}
       .p2-dist-block:last-child{border-bottom:0}
       .p2-dist-block h3{margin:0 0 10px;font-size:22px;line-height:1.42;color:#111}
@@ -445,19 +445,19 @@ function buildPdfPersonalSatisfactionV2(rowsChunk, allRows, group, groupIndex, g
 }
 
 function makeQuestionChunksV2(rows) {
-  // PDF 以閱讀性優先：每一題單獨一頁，避免為了塞兩題而縮小字體。
-  return state.quizColumns.map((column, index) => [{
-    column,
-    index,
-    weight: 0
-  }]);
+  const items = state.quizColumns.map((column, index) => ({ column, index, weight: 0 }));
+  const chunks = [];
+  for (let i = 0; i < items.length; i += 2) {
+    chunks.push(items.slice(i, i + 2));
+  }
+  return chunks;
 }
 
 function buildPdfQuestionsV2(rows, chunk, pageIndex, pageCount) {
   const wrapper = createPdfPageV2('landscape');
   const correctAnswers = typeof inferCorrectAnswers === 'function' ? inferCorrectAnswers(rows) : [];
   const code = cleanText(rows[0]?.['課程代碼'] || '').replace(/^'/, '');
-  const rowHeight = 450;
+  const rowHeight = chunk.length === 1 ? 420 : 220;
 
   const body = chunk.map(item => {
     const index = item.index;
@@ -488,11 +488,11 @@ function buildPdfQuestionsV2(rows, chunk, pageIndex, pageCount) {
   wrapper.innerHTML = `
     <style>
       ${basePdfStylesV2()}
-      .p2-sheet h2{font-size:31px!important;margin-bottom:14px!important;color:#111!important}
-      .p2-sub{font-size:20px!important;margin-bottom:12px!important;color:#111!important}
-      .p2-question{font-size:26px;line-height:1.52}
-      .p2-question th,.p2-question td{padding:12px 10px}
-      .p2-question th{font-size:23px;background:#e7e7e7!important;color:#111!important}
+      .p2-sheet h2{font-size:28px!important;margin-bottom:12px!important;color:#111!important}
+      .p2-sub{font-size:18px!important;margin-bottom:10px!important;color:#111!important}
+      .p2-question{font-size:22px;line-height:1.48}
+      .p2-question th,.p2-question td{padding:9px 9px}
+      .p2-question th{font-size:16px;background:#e7e7e7!important;color:#111!important}
       .p2-question th:nth-child(1){width:7%}
       .p2-question th:nth-child(2){width:10%}
       .p2-question th:nth-child(3){width:40%}
