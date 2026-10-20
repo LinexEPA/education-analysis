@@ -54,17 +54,31 @@ function parseQuizText(raw) {
       continue;
     }
 
-    // 若目前已有題目，先辨識「裸數字選項」逐行格式：
-    // 1.選項一
-    // 2.選項二
-    // 這要在題號辨識前做，否則會被誤當成新題目。
+    // 若目前已有題目，先處理「裸數字」的歧義：
+    // 既可能是選項（1.選項、2.選項），也可能是下一題（5.題目）。
+    // 若目前已有至少 2 個選項，且數字剛好是下一題號，同時：
+    // - 已有 4 個以上選項，或
+    // - 文字看起來像問句
+    // 就優先視為下一題，避免 Q5 被誤吃成 Q4 的第 5 個選項。
     if (current) {
-      const bareOption = line.match(/^(\d+)\s*[.．、:：)]\s*(.*)$/);
-      if (bareOption) {
-        const optionNumber = Number(bareOption[1]);
+      const bareNumbered = line.match(/^(\d+)\s*[.．、:：)]\s*(.*)$/);
+      if (bareNumbered) {
+        const number = Number(bareNumbered[1]);
+        const body = String(bareNumbered[2] || '').trim();
+        const looksLikeQuestion = /[？?]$/.test(body)
+          || /下列何者|何者最|何者正確|為何|何時|如何|是否|什麼|哪一|評估|確認|判斷/.test(body);
+        const isNextQuestion = current.options.length >= 2
+          && number === current.number + 1
+          && (current.options.length >= 4 || looksLikeQuestion);
+
+        if (isNextQuestion) {
+          startQuestion(number, body);
+          continue;
+        }
+
         const expectedOption = current.options.length + 1;
-        if (optionNumber === expectedOption) {
-          addOption(bareOption[1], bareOption[2]);
+        if (number === expectedOption) {
+          addOption(bareNumbered[1], body);
           continue;
         }
       }
