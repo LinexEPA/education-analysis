@@ -15,6 +15,15 @@ buildSatisfactionWorksheet = function(workbook, rows) {
   ws.getCell('H3').value = `回收率：${meta.responseRate === '' ? '' : `${Number(meta.responseRate).toFixed(1)}%`}`;
   ws.getCell('B4').value = `日期：${meta.dateDisplay || ''}`;
 
+  let signRowNumber = null;
+  ws.eachRow((row, rowNumber) => {
+    const first = String(row.getCell(1).value ?? '').trim();
+    if (first.startsWith('製表人')) signRowNumber = rowNumber;
+  });
+  if (signRowNumber) {
+    ws.getCell(signRowNumber, 1).value = `製表人：${meta.preparer || ''}`;
+  }
+
   ['B3', 'D3', 'H3', 'B4'].forEach(addr => {
     const cell = ws.getCell(addr);
     cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
