@@ -316,30 +316,30 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
       ${basePdfStylesV2()}
       .p2-sheet h2{font-size:30px!important;color:#111!important;margin-bottom:12px!important}
       .p2-sub{font-size:20px!important;color:#111!important;margin-bottom:16px!important}
-      .p2-dist-grid{display:grid;grid-template-columns:1fr;gap:20px;transform:scale(.8);transform-origin:top left;width:125%}
+      .p2-dist-grid{display:grid;grid-template-columns:1fr;gap:16px;transform:scale(.8);transform-origin:top left;width:125%}
       .p2-dist-block{break-inside:avoid;padding:0 0 17px;border-bottom:1px dashed #c9cecc}
       .p2-dist-block:last-child{border-bottom:0}
       .p2-dist-block h3{margin:0 0 10px;font-size:22px;line-height:1.42;color:#111}
       .p2-bar-list{display:grid;gap:8px}
       .p2-bar-row{
         display:grid;
-        grid-template-columns:minmax(230px, 1.35fr) minmax(300px, 2fr) 128px 88px;
+        grid-template-columns:minmax(300px, 1.65fr) minmax(200px, 1.05fr) 112px 76px;
         align-items:center;
-        gap:10px;
-        min-height:30px;
+        gap:8px;
+        min-height:28px;
         font-size:17px;
       }
       .p2-bar-label{line-height:1.35;color:#111}
-      .p2-bar-track{height:13px;border-radius:999px;background:#e7ecea;overflow:hidden}
+      .p2-bar-track{height:11px;max-width:340px;border-radius:999px;background:#e7ecea;overflow:hidden}
       .p2-bar-fill{height:100%;border-radius:999px;background:#5ca99f}
-      .p2-bar-value{text-align:right;color:#222;white-space:nowrap;font-weight:700}
+      .p2-bar-value{text-align:right;color:#222;white-space:nowrap;font-weight:700;font-size:16px}
       .p2-bar-flag{
-        min-height:24px;
+        min-height:22px;
         display:flex;
         align-items:center;
         justify-content:center;
         border-radius:999px;
-        font-size:13px;
+        font-size:12px;
         font-weight:700;
         color:#333;
         background:#f0f1ef;
