@@ -26,12 +26,6 @@ exportBtn.addEventListener('click', async () => {
     buildQuestionSummaryWorksheet(workbook, rows);
     buildAnswerDetailWorksheet(workbook, rows);
 
-    const comments = rows
-      .map(row => cleanText(row['感想與建議']))
-      .filter(Boolean)
-      .filter(text => text !== '無');
-    if (comments.length) buildCommentsWorksheet(workbook, comments);
-
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
