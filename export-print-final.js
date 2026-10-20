@@ -131,7 +131,8 @@
     const passRateText = examSummary.passRate == null ? '—' : `${examSummary.passRate}%`;
 
     ws.mergeCells('A2:F2');
-    ws.getCell('A2').value = `課程代碼：${courseCode(rows)}　｜　平均分數：${averageScoreText}　｜　及格率：${passRateText}`;
+    const hasMultiple = state.parsedQuiz?.some(question => typeof window.isMultipleQuizQuestion === 'function' && window.isMultipleQuizQuestion(question));
+    ws.getCell('A2').value = `課程代碼：${courseCode(rows)}　｜　平均分數：${averageScoreText}　｜　及格率：${passRateText}${hasMultiple ? '　｜　複選題比例＝該選項被選人數÷有效填答人數' : ''}`;
     ws.getCell('A2').font = { name: 'DFKai-SB', size: 13, color: { argb: BLACK } };
     ws.getCell('A2').alignment = { horizontal: 'left', vertical: 'middle', indent: 1 };
     ws.getRow(2).height = 28;
@@ -143,25 +144,56 @@
       const parsed = state.parsedQuiz[index];
       const questionText = parsed?.question || column;
       const distribution = {};
+      const isMultiple = typeof window.isMultipleQuizQuestion === 'function'
+        ? window.isMultipleQuizQuestion(parsed)
+        : false;
+      let respondentTotal = 0;
+
+      if (isMultiple && parsed?.options?.length) {
+        parsed.options.forEach(option => {
+          const code = cleanText(option.code);
+          distribution[normalizeCode(code) || code] = {
+            code,
+            text: cleanText(option.text || ''),
+            count: 0
+          };
+        });
+      }
 
       rows.forEach(row => {
         const raw = cleanText(row[column]);
         if (!raw) return;
-        const option = typeof findOptionForResponse === 'function' ? findOptionForResponse(parsed, raw) : (typeof findOption === 'function' ? findOption(parsed, raw) : null);
-        const code = cleanText(option?.code || raw);
-        const key = normalizeCode(code) || code;
-        if (!distribution[key]) {
-          distribution[key] = {
-            code,
-            text: cleanText(option?.text || ''),
-            count: 0
-          };
-        }
-        distribution[key].count += 1;
+        respondentTotal += 1;
+
+        const rawValues = isMultiple && typeof window.splitQuizResponseValues === 'function'
+          ? window.splitQuizResponseValues(raw, parsed)
+          : [raw];
+
+        const seen = new Set();
+        rawValues.forEach(rawValue => {
+          const option = typeof findOptionForResponse === 'function'
+            ? findOptionForResponse(parsed, rawValue)
+            : (typeof findOption === 'function' ? findOption(parsed, rawValue) : null);
+          const code = cleanText(option?.code || rawValue);
+          const key = normalizeCode(code) || code;
+          if (!key || seen.has(key)) return;
+          seen.add(key);
+
+          if (!distribution[key]) {
+            distribution[key] = {
+              code,
+              text: cleanText(option?.text || ''),
+              count: 0
+            };
+          }
+          distribution[key].count += 1;
+        });
       });
 
       const entries = Object.values(distribution).sort((a, b) => naturalSort(a.code, b.code));
-      const total = entries.reduce((sum, item) => sum + item.count, 0);
+      const total = isMultiple
+        ? respondentTotal
+        : entries.reduce((sum, item) => sum + item.count, 0);
 
       if (!entries.length) entries.push({ code: '', text: '', count: 0 });
 
@@ -259,23 +291,31 @@
   }
 
   function quizPaperDisplayCorrect(parsed, rawCorrect, useAlphabetic) {
-    const raw = normalizeCode(rawCorrect);
-    if (!raw) return '';
+    const rawValues = typeof window.splitQuizResponseValues === 'function'
+      ? window.splitQuizResponseValues(rawCorrect, parsed)
+      : [rawCorrect];
 
-    let index = parsed?.options?.findIndex(option => normalizeCode(option.code) === raw) ?? -1;
+    const display = rawValues.map(value => {
+      const raw = normalizeCode(value);
+      if (!raw) return '';
 
-    if (index < 0 && /^\d+$/.test(raw)) {
-      const position = Number(raw) - 1;
-      if (position >= 0 && position < (parsed?.options?.length || 0)) index = position;
-    }
+      let index = parsed?.options?.findIndex(option => normalizeCode(option.code) === raw) ?? -1;
 
-    if (index < 0 && /^[A-Z]$/.test(raw)) {
-      const position = raw.charCodeAt(0) - 65;
-      if (position >= 0 && position < (parsed?.options?.length || 0)) index = position;
-    }
+      if (index < 0 && /^\d+$/.test(raw)) {
+        const position = Number(raw) - 1;
+        if (position >= 0 && position < (parsed?.options?.length || 0)) index = position;
+      }
 
-    if (index < 0) return rawCorrect || '';
-    return useAlphabetic ? String.fromCharCode(65 + index) : String(index + 1);
+      if (index < 0 && /^[A-Z]$/.test(raw)) {
+        const position = raw.charCodeAt(0) - 65;
+        if (position >= 0 && position < (parsed?.options?.length || 0)) index = position;
+      }
+
+      if (index < 0) return raw;
+      return useAlphabetic ? String.fromCharCode(65 + index) : String(index + 1);
+    }).filter(Boolean);
+
+    return display.join('、');
   }
 
   // ---------- 3. 教育訓練測驗題目 ----------
