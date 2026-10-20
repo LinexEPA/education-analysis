@@ -329,10 +329,12 @@ function renderQuizDistribution() {
 
     const rows = Object.entries(distribution)
       .sort(([a], [b]) => naturalSort(a, b))
-      .map(([code, count]) => {
+      .map(([rawCode, count]) => {
         const pct = total ? (count / total) * 100 : 0;
-        const mapped = labels[normalizeCode(code)];
-        const displayLabel = mapped ? `${code}. ${mapped}` : code;
+        const option = typeof findOption === 'function' ? findOption(parsed, rawCode) : null;
+        const displayCode = option?.code || rawCode;
+        const mapped = option?.text || labels[normalizeCode(rawCode)] || '';
+        const displayLabel = mapped ? `${displayCode}. ${mapped}` : rawCode;
         return `
           <div class="bar-row">
             <div>${escapeHtml(displayLabel)}</div>
