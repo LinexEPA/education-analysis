@@ -300,17 +300,11 @@ buildQuestionSummaryWorksheet = function(workbook, rows) {
 };
 
 function inferCorrectAnswers(rows) {
-  const perfectRows = rows.filter(row => {
-    const score = toNumber(row['得分']);
-    return score != null && Math.abs(score - 100) < 0.0001;
-  });
-
-  return state.quizColumns.map(column => {
-    if (!perfectRows.length) return '';
-    const answers = perfectRows.map(row => cleanText(row[column])).filter(Boolean);
-    if (!answers.length) return '';
-    const normalized = [...new Set(answers.map(normalizeCode))];
-    return normalized.length === 1 ? answers[0] : '';
+  // 正確答案只接受使用者在貼上的題目文字中明確提供。
+  // 不再依「100 分學員」或任何作答分布反推，避免沒有滿分者或資料異常時誤判。
+  return state.quizColumns.map((column, index) => {
+    const explicit = state.parsedQuiz?.[index]?.correctAnswer;
+    return explicit ? normalizeCode(explicit) : '';
   });
 }
 
