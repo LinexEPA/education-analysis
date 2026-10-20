@@ -38,7 +38,29 @@ async function exportCompletePdfV2() {
     // 1. 滿意度統計表：直式。
     sections.push({ orientation: 'portrait', element: buildPdfSatisfactionV2(rows) });
 
-    // 2. 個人作答明細：直式。資料過多時以人數分頁，不縮小字體。
+    // 2. 測驗作答分布：橫式，接在滿意度後面。
+    const distributionChunks = chunkArrayV2(
+      state.quizColumns.map((column, index) => ({ column, index })),
+      4
+    );
+    distributionChunks.forEach((chunk, index) => {
+      if (!chunk.length) return;
+      sections.push({
+        orientation: 'landscape',
+        element: buildPdfQuizDistributionV2(rows, chunk, index + 1, distributionChunks.length)
+      });
+    });
+
+    // 3. 教育訓練測驗題目：橫式。長題目單獨一頁，短題目每頁最多兩題。
+    const questionChunks = makeQuestionChunksV2(rows);
+    questionChunks.forEach((chunk, index) => {
+      sections.push({
+        orientation: 'landscape',
+        element: buildPdfQuestionsV2(rows, chunk, index + 1, questionChunks.length)
+      });
+    });
+
+    // 4. 個人作答明細（測驗）：直式。
     const rowChunks = chunkArrayV2(rows, 18);
     rowChunks.forEach((chunk, index) => {
       sections.push({
@@ -47,7 +69,7 @@ async function exportCompletePdfV2() {
       });
     });
 
-    // 3. 個人滿意度明細：10 題全部放在同一頁寬度內；人數過多時只做縱向分頁，不拆題目。
+    // 5. 個人作答明細（滿意度）：直式。
     const activeSatColumns = typeof window.getActiveSatisfactionColumns === 'function'
       ? window.getActiveSatisfactionColumns()
       : state.satisfactionColumns;
@@ -68,15 +90,6 @@ async function exportCompletePdfV2() {
         });
       });
     }
-
-    // 4. 題目統計：橫式。長題目單獨一頁，短題目每頁最多兩題。
-    const questionChunks = makeQuestionChunksV2(rows);
-    questionChunks.forEach((chunk, index) => {
-      sections.push({
-        orientation: 'landscape',
-        element: buildPdfQuestionsV2(rows, chunk, index + 1, questionChunks.length)
-      });
-    });
 
     sections.forEach(section => {
       document.body.appendChild(section.element);
@@ -172,19 +185,19 @@ function createPdfPageV2(orientation) {
 function basePdfStylesV2() {
   return `
     .p2-sheet{font-family:DFKai-SB,BiauKai,標楷體,serif;font-size:16px;line-height:1.4;color:#111}
-    .p2-sheet h1,.p2-sheet h2{margin:0;text-align:center;font-weight:700}
+    .p2-sheet h1,.p2-sheet h2{margin:0;text-align:center;font-weight:700;color:#111}
     .p2-sheet h1{font-size:24px;letter-spacing:1px;margin-bottom:10px}
     .p2-sheet h2{font-size:22px;margin-bottom:12px}
     .p2-sub{font-size:16px;margin:0 0 10px;text-align:left}
     .p2-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:16px}
     .p2-table th,.p2-table td{border:1px solid #777;padding:6px 5px;vertical-align:middle;box-sizing:border-box}
-    .p2-table th{background:#24577f;color:#fff;text-align:center;font-weight:700}
+    .p2-table th{background:#e7e7e7;color:#111;text-align:center;font-weight:700}
     .p2-table td{overflow-wrap:anywhere;word-break:break-word}
     .p2-center{text-align:center!important}
     .p2-left{text-align:left!important}
     .p2-top{vertical-align:top!important}
     .p2-num,.p2-latin{font-family:"Times New Roman",serif!important}
-    .p2-green{background:#e2f0d9;font-weight:700}
+    .p2-green{background:#f1f1f1;font-weight:700}
   `;
 }
 
@@ -247,6 +260,72 @@ function buildPdfSatisfactionV2(rows) {
   return wrapper;
 }
 
+function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
+  const wrapper = createPdfPageV2('landscape');
+  const code = cleanText(rows[0]?.['課程代碼'] || '').replace(/^'/, '');
+
+  const blocks = chunk.map(item => {
+    const parsed = state.parsedQuiz[item.index];
+    const question = parsed?.question || item.column;
+    const labels = Object.fromEntries((parsed?.options || []).map(opt => [normalizeCode(opt.code), cleanText(opt.text)]));
+    const counts = {};
+    rows.forEach(row => {
+      const raw = cleanText(row[item.column]);
+      if (!raw) return;
+      counts[raw] = (counts[raw] || 0) + 1;
+    });
+    const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
+
+    const rowsHtml = Object.entries(counts)
+      .sort(([a], [b]) => naturalSort(a, b))
+      .map(([codeValue, count]) => {
+        const label = labels[normalizeCode(codeValue)] || '';
+        const pct = total ? (count / total) * 100 : 0;
+        return `
+          <tr>
+            <td class="p2-center p2-num">${escapePdfV2(codeValue)}</td>
+            <td class="p2-left">${escapePdfV2(label)}</td>
+            <td class="p2-center p2-num">${count}</td>
+            <td class="p2-center p2-num">${pct.toFixed(1)}%</td>
+          </tr>`;
+      }).join('');
+
+    return `
+      <section class="p2-dist-block">
+        <h3>${item.index + 1}. ${escapePdfV2(question)}</h3>
+        <table class="p2-table p2-dist-table">
+          <thead><tr><th>作答選項</th><th>選項內容</th><th>人數</th><th>比例</th></tr></thead>
+          <tbody>${rowsHtml || '<tr><td colspan="4" class="p2-center">沒有有效作答資料</td></tr>'}</tbody>
+        </table>
+      </section>`;
+  }).join('');
+
+  wrapper.innerHTML = `
+    <style>
+      ${basePdfStylesV2()}
+      .p2-sheet h2{font-size:28px!important;color:#111!important;margin-bottom:10px!important}
+      .p2-sub{font-size:18px!important;color:#111!important;margin-bottom:12px!important}
+      .p2-dist-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px}
+      .p2-dist-block{break-inside:avoid}
+      .p2-dist-block h3{margin:0 0 7px;font-size:18px;line-height:1.35;color:#111}
+      .p2-dist-table{font-size:16px}
+      .p2-dist-table th,.p2-dist-table td{padding:6px 7px}
+      .p2-dist-table th{background:#e7e7e7!important;color:#111!important}
+      .p2-dist-table th:nth-child(1){width:15%}
+      .p2-dist-table th:nth-child(2){width:55%}
+      .p2-dist-table th:nth-child(3){width:15%}
+      .p2-dist-table th:nth-child(4){width:15%}
+    </style>
+    <div class="p2-sheet">
+      <h2>教育訓練測驗作答分布</h2>
+      <div class="p2-sub">課程代碼：${escapePdfV2(code)}　｜　作答分布 ${pageIndex}/${pageCount}</div>
+      <div class="p2-dist-grid">${blocks}</div>
+    </div>`;
+
+  applyMixedFontsPdfV2(wrapper);
+  return wrapper;
+}
+
 function buildPdfPersonalQuizV2(rowsChunk, allRows, pageIndex, pageCount) {
   const wrapper = createPdfPageV2('portrait');
   const quizColumns = state.quizColumns;
@@ -278,7 +357,7 @@ function buildPdfPersonalQuizV2(rowsChunk, allRows, pageIndex, pageCount) {
       .p2-personal th:nth-child(5){width:9%}
     </style>
     <div class="p2-sheet">
-      <h2>教育訓練測驗－個人作答明細</h2>
+      <h2>教育訓練－個人作答明細（測驗）</h2>
       <div class="p2-sub">課程代碼：${escapePdfV2(code)}　｜　Q＝測驗作答${pageCount > 1 ? `　｜　${pageIndex}/${pageCount}` : ''}</div>
       <table class="p2-table p2-personal">
         <thead><tr><th>序</th><th>姓名</th><th>單位</th><th>及格</th><th>得分</th>${qHeaders}</tr></thead>
@@ -322,7 +401,7 @@ function buildPdfPersonalSatisfactionV2(rowsChunk, allRows, group, groupIndex, g
       ${isLastGroup ? '.p2-personal-sat th:last-child{width:22%}' : ''}
     </style>
     <div class="p2-sheet">
-      <h2>教育訓練測驗－個人作答明細（滿意度）</h2>
+      <h2>教育訓練－個人作答明細（滿意度）</h2>
       <div class="p2-sub">課程代碼：${escapePdfV2(code)}　｜　滿1～滿${group.length}＝滿意度題目${pageCount > 1 ? `　｜　人員 ${pageIndex}/${pageCount}` : ''}</div>
       <table class="p2-table p2-personal-sat">
         <thead><tr><th>序</th><th>姓名</th><th>單位</th>${headers}${isLastGroup ? '<th>感想與建議</th>' : ''}</tr></thead>
@@ -376,7 +455,7 @@ function buildPdfQuestionsV2(rows, chunk, pageIndex, pageCount) {
   const wrapper = createPdfPageV2('landscape');
   const correctAnswers = typeof inferCorrectAnswers === 'function' ? inferCorrectAnswers(rows) : [];
   const code = cleanText(rows[0]?.['課程代碼'] || '').replace(/^'/, '');
-  const rowHeight = chunk.length === 1 ? 540 : 292;
+  const rowHeight = chunk.length === 1 ? 540 : 305;
 
   const body = chunk.map(item => {
     const index = item.index;
@@ -407,19 +486,19 @@ function buildPdfQuestionsV2(rows, chunk, pageIndex, pageCount) {
   wrapper.innerHTML = `
     <style>
       ${basePdfStylesV2()}
-      .p2-sheet h2{font-size:27px!important;margin-bottom:14px!important}
-      .p2-sub{font-size:18px!important;margin-bottom:12px!important}
-      .p2-question{font-size:20px;line-height:1.45}
-      .p2-question th,.p2-question td{padding:9px 8px}
-      .p2-question th{font-size:20px}
+      .p2-sheet h2{font-size:29px!important;margin-bottom:14px!important;color:#111!important}
+      .p2-sub{font-size:19px!important;margin-bottom:12px!important;color:#111!important}
+      .p2-question{font-size:23px;line-height:1.48}
+      .p2-question th,.p2-question td{padding:11px 9px}
+      .p2-question th{font-size:22px;background:#e7e7e7!important;color:#111!important}
       .p2-question th:nth-child(1){width:7%}
       .p2-question th:nth-child(2){width:10%}
       .p2-question th:nth-child(3){width:40%}
       .p2-question th:nth-child(4){width:43%}
     </style>
     <div class="p2-sheet">
-      <h2>教育訓練測驗－題目作答統計</h2>
-      <div class="p2-sub">課程代碼：${escapePdfV2(code)}　｜　題目統計 ${pageIndex}/${pageCount}</div>
+      <h2>教育訓練測驗題目</h2>
+      <div class="p2-sub">課程代碼：${escapePdfV2(code)}　｜　題目 ${pageIndex}/${pageCount}</div>
       <table class="p2-table p2-question">
         <thead><tr><th>題號</th><th>正確答案</th><th>題目</th><th>選項</th></tr></thead>
         <tbody>${body}</tbody>
