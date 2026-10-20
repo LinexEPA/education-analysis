@@ -263,6 +263,9 @@ function buildPdfSatisfactionV2(rows) {
 function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
   const wrapper = createPdfPageV2('landscape');
   const code = cleanText(rows[0]?.['課程代碼'] || '').replace(/^'/, '');
+  const examSummary = typeof calculateExamSummary === 'function' ? calculateExamSummary() : {};
+  const averageScoreText = examSummary.averageScore == null ? '—' : examSummary.averageScore;
+  const passRateText = examSummary.passRate == null ? '—' : `${examSummary.passRate}%`;
 
   const blocks = chunk.map(item => {
     const parsed = state.parsedQuiz[item.index];
@@ -351,7 +354,7 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
     </style>
     <div class="p2-sheet">
       <h2>教育訓練測驗作答分布</h2>
-      <div class="p2-sub">課程代碼：${escapePdfV2(code)}　｜　作答分布 ${pageIndex}/${pageCount}</div>
+      <div class="p2-sub">課程代碼：${escapePdfV2(code)}　｜　平均分數：${escapePdfV2(averageScoreText)}　｜　及格率：${escapePdfV2(passRateText)}　｜　作答分布 ${pageIndex}/${pageCount}</div>
       <div class="p2-dist-grid">${blocks}</div>
     </div>`;
 
@@ -363,6 +366,8 @@ function buildPdfPersonalQuizV2(rowsChunk, allRows, pageIndex, pageCount) {
   const wrapper = createPdfPageV2('portrait');
   const quizColumns = state.quizColumns;
   const code = cleanText(allRows[0]?.['課程代碼'] || '').replace(/^'/, '');
+  const examSummary = typeof calculateExamSummary === 'function' ? calculateExamSummary() : {};
+  const averageScoreText = examSummary.averageScore == null ? '—' : examSummary.averageScore;
 
   const body = rowsChunk.map((row, localIndex) => {
     const originalIndex = allRows.indexOf(row);
@@ -391,7 +396,7 @@ function buildPdfPersonalQuizV2(rowsChunk, allRows, pageIndex, pageCount) {
     </style>
     <div class="p2-sheet">
       <h2>教育訓練－個人作答明細（測驗）</h2>
-      <div class="p2-sub">課程代碼：${escapePdfV2(code)}　｜　Q＝測驗作答${pageCount > 1 ? `　｜　${pageIndex}/${pageCount}` : ''}</div>
+      <div class="p2-sub">課程代碼：${escapePdfV2(code)}　｜　平均分數：${escapePdfV2(averageScoreText)}　｜　Q＝測驗作答${pageCount > 1 ? `　｜　${pageIndex}/${pageCount}` : ''}</div>
       <table class="p2-table p2-personal">
         <thead><tr><th>序</th><th>姓名</th><th>單位</th><th>及格</th><th>得分</th>${qHeaders}</tr></thead>
         <tbody>${body}</tbody>
