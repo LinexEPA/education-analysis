@@ -31,7 +31,9 @@
       const ws = workbook.getWorksheet('個人作答明細');
       if (!ws) return;
 
-      const satCount = state.satisfactionColumns.length;
+      const satCount = typeof window.getActiveSatisfactionColumns === 'function'
+        ? window.getActiveSatisfactionColumns().length
+        : state.satisfactionColumns.length;
       if (!satCount) return;
 
       // 欄位順序：序、姓名、單位、及格、得分、Q...、滿...、感想與建議
