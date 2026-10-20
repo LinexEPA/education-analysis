@@ -1640,3 +1640,17 @@ h1 {
     flex-wrap: wrap;
   }
 }
+
+
+/* A11：縮小使用步驟箭頭前後間距 */
+.hero-howto li + li::before {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+@media (max-width: 560px) {
+  .hero-howto li + li::before {
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+}
