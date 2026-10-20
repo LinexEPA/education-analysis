@@ -126,8 +126,12 @@
     styleTitle(ws.getCell('A1'), 19);
     ws.getRow(1).height = 36;
 
+    const examSummary = typeof calculateExamSummary === 'function' ? calculateExamSummary() : {};
+    const averageScoreText = examSummary.averageScore == null ? '—' : examSummary.averageScore;
+    const passRateText = examSummary.passRate == null ? '—' : `${examSummary.passRate}%`;
+
     ws.mergeCells('A2:F2');
-    ws.getCell('A2').value = `課程代碼：${courseCode(rows)}　｜　呈現各選項實際作答人數與比例`;
+    ws.getCell('A2').value = `課程代碼：${courseCode(rows)}　｜　平均分數：${averageScoreText}　｜　及格率：${passRateText}`;
     ws.getCell('A2').font = { name: 'DFKai-SB', size: 13, color: { argb: BLACK } };
     ws.getCell('A2').alignment = { horizontal: 'left', vertical: 'middle', indent: 1 };
     ws.getRow(2).height = 28;
@@ -379,7 +383,9 @@
     ws.getRow(1).height = 36;
 
     ws.mergeCells(2, 1, 2, headers.length);
-    ws.getCell(2, 1).value = `課程代碼：${courseCode(rows)}　｜　Q＝測驗作答`;
+    const examSummary = typeof calculateExamSummary === 'function' ? calculateExamSummary() : {};
+    const averageScoreText = examSummary.averageScore == null ? '—' : examSummary.averageScore;
+    ws.getCell(2, 1).value = `課程代碼：${courseCode(rows)}　｜　平均分數：${averageScoreText}　｜　Q＝測驗作答`;
     ws.getCell(2, 1).font = { name: 'DFKai-SB', size: 13, color: { argb: BLACK } };
     ws.getCell(2, 1).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
     ws.getRow(2).height = 28;
