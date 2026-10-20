@@ -260,14 +260,11 @@ function splitByMarkers(text, markers) {
     const next = markers[index + 1];
     const end = next ? next.index : text.length;
     const rawText = text.slice(marker.end, end).trim();
-    const answerInfo = stripExplicitAnswer(rawText);
     return {
       code: marker.code,
-      text: answerInfo.text.trim(),
-      answer: answerInfo.answer || ''
+      text: rawText
     };
   });
 
-  // 若答案標在最後一個選項尾端，保留於最後 option，外層 addOption 會接手。
   return { prefix, options };
 }
