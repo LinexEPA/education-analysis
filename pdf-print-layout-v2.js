@@ -272,16 +272,43 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
     const question = parsed?.question || item.column;
     const labels = Object.fromEntries((parsed?.options || []).map(opt => [normalizeCode(opt.code), cleanText(opt.text)]));
     const counts = {};
+    const isMultiple = typeof window.isMultipleQuizQuestion === 'function'
+      ? window.isMultipleQuizQuestion(parsed)
+      : false;
+    let respondentTotal = 0;
+
+    if (isMultiple && parsed?.options?.length) {
+      parsed.options.forEach(option => {
+        counts[normalizeCode(option.code)] = 0;
+      });
+    }
 
     rows.forEach(row => {
       const raw = cleanText(row[item.column]);
       if (!raw) return;
-      counts[raw] = (counts[raw] || 0) + 1;
+      respondentTotal += 1;
+
+      const rawValues = isMultiple && typeof window.splitQuizResponseValues === 'function'
+        ? window.splitQuizResponseValues(raw, parsed)
+        : [raw];
+
+      const seen = new Set();
+      rawValues.forEach(rawValue => {
+        const option = typeof findOptionForResponse === 'function'
+          ? findOptionForResponse(parsed, rawValue)
+          : (typeof findOption === 'function' ? findOption(parsed, rawValue) : null);
+        const key = normalizeCode(option?.code || rawValue);
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        counts[key] = (counts[key] || 0) + 1;
+      });
     });
 
     const entries = Object.entries(counts)
       .sort(([a], [b]) => naturalSort(a, b));
-    const total = entries.reduce((sum, [, count]) => sum + count, 0);
+    const total = isMultiple
+      ? respondentTotal
+      : entries.reduce((sum, [, count]) => sum + count, 0);
     const values = entries.map(([, count]) => count);
     const maxCount = values.length ? Math.max(...values) : 0;
     const minCount = values.length ? Math.min(...values) : 0;
@@ -309,7 +336,7 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
 
     return `
       <section class="p2-dist-block">
-        <h3>${item.index + 1}. ${escapePdfV2(question)}</h3>
+        <h3>${item.index + 1}. ${escapePdfV2(question)}${isMultiple ? '　<span class="p2-multi-tag">複選｜選項被選率</span>' : ''}</h3>
         <div class="p2-bar-list">
           ${bars || '<div class="p2-empty">沒有有效作答資料</div>'}
         </div>
@@ -325,6 +352,7 @@ function buildPdfQuizDistributionV2(rows, chunk, pageIndex, pageCount) {
       .p2-dist-block{break-inside:avoid;padding:0 0 17px;border-bottom:1px dashed #c9cecc}
       .p2-dist-block:last-child{border-bottom:0}
       .p2-dist-block h3{margin:0 0 10px;font-size:22px;line-height:1.42;color:#111}
+      .p2-multi-tag{font-size:12px;font-weight:700;color:#555;border:1px solid #bbb;border-radius:999px;padding:2px 7px;vertical-align:2px}
       .p2-bar-list{display:grid;gap:8px}
       .p2-bar-row{
         display:grid;
@@ -474,23 +502,31 @@ function pdfQuizPaperUsesAlphabeticCodesV2() {
 }
 
 function pdfQuizPaperDisplayCorrectV2(parsed, rawCorrect, useAlphabetic) {
-  const raw = normalizeCode(rawCorrect);
-  if (!raw) return '';
+  const rawValues = typeof window.splitQuizResponseValues === 'function'
+    ? window.splitQuizResponseValues(rawCorrect, parsed)
+    : [rawCorrect];
 
-  let index = parsed?.options?.findIndex(option => normalizeCode(option.code) === raw) ?? -1;
+  const display = rawValues.map(value => {
+    const raw = normalizeCode(value);
+    if (!raw) return '';
 
-  if (index < 0 && /^\d+$/.test(raw)) {
-    const position = Number(raw) - 1;
-    if (position >= 0 && position < (parsed?.options?.length || 0)) index = position;
-  }
+    let index = parsed?.options?.findIndex(option => normalizeCode(option.code) === raw) ?? -1;
 
-  if (index < 0 && /^[A-Z]$/.test(raw)) {
-    const position = raw.charCodeAt(0) - 65;
-    if (position >= 0 && position < (parsed?.options?.length || 0)) index = position;
-  }
+    if (index < 0 && /^\d+$/.test(raw)) {
+      const position = Number(raw) - 1;
+      if (position >= 0 && position < (parsed?.options?.length || 0)) index = position;
+    }
 
-  if (index < 0) return rawCorrect || '';
-  return useAlphabetic ? String.fromCharCode(65 + index) : String(index + 1);
+    if (index < 0 && /^[A-Z]$/.test(raw)) {
+      const position = raw.charCodeAt(0) - 65;
+      if (position >= 0 && position < (parsed?.options?.length || 0)) index = position;
+    }
+
+    if (index < 0) return raw;
+    return useAlphabetic ? String.fromCharCode(65 + index) : String(index + 1);
+  }).filter(Boolean);
+
+  return display.join('、');
 }
 
 function buildPdfQuestionsV2(rows, chunk, pageIndex, pageCount) {
