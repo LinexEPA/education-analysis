@@ -2,11 +2,22 @@
 // 1) 支援常見的「1.題目 + (1)選項」格式。
 // 2) 支援選項不用括號：題目下一行可直接寫 1.選項、2.選項、3.選項、4.選項。
 // 3) 支援同一行貼上：1.題目 1.選項 2.選項 3.選項 4.選項，不必手動換行。
-// 4) 正確答案只接受使用者明確提供（答案：3／正確答案：B），不從學員成績反推。
+// 4) 支援「空白列＝下一題」快速貼法：每題一個區塊，題目與選項照原樣換行即可。
+ // 5) 正確答案只接受使用者明確提供（答案：3／正確答案：B），不從學員成績反推。
 // 本檔在 app.js 後載入，覆寫同名解析函式。
 
 function parseQuizText(raw) {
   const text = normalizeFullWidth(raw).replace(/\r\n?/g, '\n');
+
+  // 便利模式：若文字中有「空白列」分隔，而且每個區塊都能辨識出至少 2 個選項，
+  // 就直接把每個區塊視為一題。這適合從院內題庫的「題目內容」欄逐題貼上：
+  // 題幹 + Enter + 1.選項 + 2.選項...，題與題之間留一個空白列即可。
+  const blockQuestions = parseBlankLineQuestionBlocks(text);
+  if (blockQuestions.length >= 2) {
+    finalizeQuizQuestions(blockQuestions);
+    return blockQuestions;
+  }
+
   const lines = text.split('\n');
   const questions = [];
   let current = null;
@@ -169,8 +180,132 @@ function parseQuizText(raw) {
   }
 
   questions.sort((a, b) => a.number - b.number);
+  finalizeQuizQuestions(questions);
+  return questions;
+}
 
+function parseBlankLineQuestionBlocks(text) {
+  // 至少需要 2 個由空白列分開的區塊，避免一般題目內偶然空一行就被誤判。
+  const blocks = String(text || '')
+    .split(/\n[\t ]*\n+/)
+    .map(block => block.trim())
+    .filter(Boolean);
+
+  if (blocks.length < 2) return [];
+
+  const parsed = blocks.map((block, blockIndex) => parseSingleQuestionBlock(block, blockIndex + 1));
+  const validCount = parsed.filter(question => question.question && question.options.length >= 2).length;
+
+  // 所有區塊都必須像完整題目才啟用快速模式；否則回到既有解析規則。
+  if (validCount !== blocks.length) return [];
+  return parsed;
+}
+
+function parseSingleQuestionBlock(block, fallbackNumber) {
+  const lines = String(block || '')
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  let explicitNumber = null;
+  let questionText = '';
+  const options = [];
+  let lastOption = null;
+  let correctAnswer = '';
+
+  function addBlockOption(code, text) {
+    const answerInfo = stripExplicitAnswer(String(text || ''));
+    lastOption = {
+      code: normalizeCode(code),
+      text: answerInfo.text.trim()
+    };
+    options.push(lastOption);
+    if (answerInfo.answer) correctAnswer = normalizeCode(answerInfo.answer);
+  }
+
+  lines.forEach((line, lineIndex) => {
+    const answerMatch = line.match(/^\[?\s*(?:正確答案|標準答案|答案|answer|ans)\s*\]?\s*[:：=]?\s*[\(\[]?\s*([A-Za-z]|\d+|O|X)\s*[\)\]]?\s*$/i);
+    if (answerMatch) {
+      correctAnswer = normalizeCode(answerMatch[1]);
+      return;
+    }
+
+    // 每個區塊第一行可有題號，也可以完全沒有題號。
+    if (lineIndex === 0) {
+      const qMatch = line.match(/^\[\s*Q\s*(\d+)\s*\]\s*(.*)$/i)
+        || line.match(/^Q\s*(\d+)\s*[.:：、-]?\s*(.*)$/i)
+        || line.match(/^第\s*(\d+)\s*題\s*[.:：、-]?\s*(.*)$/i)
+        || line.match(/^(\d+)\s*[.．、:：)]\s*(.+)$/);
+
+      if (qMatch) {
+        explicitNumber = Number(qMatch[1]);
+        questionText = String(qMatch[2] || '').trim();
+
+        const inline = extractInlineOptionSequence(questionText);
+        if (inline) {
+          questionText = inline.prefix.trim();
+          inline.options.forEach(option => addBlockOption(option.code, option.text));
+        }
+        return;
+      }
+
+      const inline = extractInlineOptionSequence(line);
+      if (inline) {
+        questionText = inline.prefix.trim();
+        inline.options.forEach(option => addBlockOption(option.code, option.text));
+      } else {
+        questionText = line;
+      }
+      return;
+    }
+
+    // 區塊內的 1. 2. 3. 4. 一律優先當成選項，不再和下一題題號打架。
+    const optionMatch = line.match(/^\(\s*([A-Za-z]|\d+|O|X)\s*\)\s*(.*)$/i)
+      || line.match(/^\[\s*([A-Za-z]|\d+|O|X)\s*\]\s*(.*)$/i)
+      || line.match(/^([A-Za-z]|O|X)\s*[.、:：)]\s*(.*)$/i)
+      || line.match(/^(\d{1,2})\s*[.．、:：)]\s*(.*)$/);
+
+    if (optionMatch) {
+      const reconstructed = `(${optionMatch[1]})${String(optionMatch[2] || '').trim()}`;
+      const inline = extractInlineOptionSequence(reconstructed);
+      if (inline && inline.options.length >= 2) {
+        inline.options.forEach(option => addBlockOption(option.code, option.text));
+      } else {
+        addBlockOption(optionMatch[1], optionMatch[2]);
+      }
+      return;
+    }
+
+    const inlineOnly = extractInlineOptionSequence(line);
+    if (inlineOnly && !inlineOnly.prefix.trim()) {
+      inlineOnly.options.forEach(option => addBlockOption(option.code, option.text));
+      return;
+    }
+
+    // 沒有選項標記的換行：已有選項就接在上一個選項，否則接在題幹。
+    if (lastOption) {
+      lastOption.text = `${lastOption.text} ${line}`.trim();
+    } else {
+      questionText = `${questionText} ${line}`.trim();
+    }
+  });
+
+  const questionAnswer = stripExplicitAnswer(questionText);
+  questionText = questionAnswer.text.trim();
+  if (questionAnswer.answer) correctAnswer = normalizeCode(questionAnswer.answer);
+
+  return {
+    number: explicitNumber || fallbackNumber,
+    question: questionText,
+    options,
+    correctAnswer,
+    warnings: []
+  };
+}
+
+function finalizeQuizQuestions(questions) {
   questions.forEach(question => {
+    if (!Array.isArray(question.warnings)) question.warnings = [];
     if (!question.question) question.warnings.push('缺少題目文字');
     if (question.options.length < 2) question.warnings.push('辨識到的選項少於 2 個');
 
@@ -184,8 +319,6 @@ function parseQuizText(raw) {
       }
     }
   });
-
-  return questions;
 }
 
 function stripExplicitAnswer(value) {
